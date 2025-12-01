@@ -252,7 +252,8 @@ body {
     border: 1px solid var(--glass-border);
 }
 
-.card:hover {
+/* إزالة hover effect من الـ cards المخصصة */
+.card:not(.role-modal):hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
@@ -812,7 +813,7 @@ body {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) !important;
     z-index: 1000;
     max-width: 600px;
     width: 90%;
@@ -822,11 +823,14 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     pointer-events: all;
+    box-shadow: var(--shadow-lg);
 }
 
 .role-modal.hidden {
     display: none !important;
     pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
 }
 
 /* Overlay للخلفية عند فتح Role Selection */
@@ -839,6 +843,7 @@ body {
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     z-index: -1;
+    pointer-events: none;
 }
 
 .role-header {
@@ -885,11 +890,17 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
 }
 
 .role-btn:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
+}
+
+.role-btn:active {
+    transform: translateY(-2px);
 }
 
 .role-icon {
@@ -911,8 +922,24 @@ body {
     border-color: var(--color-red-light);
 }
 
+.role-btn-red.selected {
+    background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
+    border-color: var(--color-red-light);
+    box-shadow: 0 0 20px rgba(255, 59, 92, 0.6);
+}
+
 .role-btn-red-light {
     border-color: var(--color-red-light);
+}
+
+.role-btn-red-light:hover {
+    background: linear-gradient(135deg, rgba(255, 107, 133, 0.2), transparent);
+}
+
+.role-btn-red-light.selected {
+    background: linear-gradient(135deg, var(--color-red-light), var(--color-red));
+    border-color: var(--color-red);
+    box-shadow: 0 0 20px rgba(255, 59, 92, 0.6);
 }
 
 .role-btn-blue {
@@ -924,8 +951,24 @@ body {
     border-color: var(--color-blue-light);
 }
 
+.role-btn-blue.selected {
+    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
+    border-color: var(--color-blue-light);
+    box-shadow: 0 0 20px rgba(45, 95, 245, 0.6);
+}
+
 .role-btn-blue-light {
     border-color: var(--color-blue-light);
+}
+
+.role-btn-blue-light:hover {
+    background: linear-gradient(135deg, rgba(91, 127, 255, 0.2), transparent);
+}
+
+.role-btn-blue-light.selected {
+    background: linear-gradient(135deg, var(--color-blue-light), var(--color-blue));
+    border-color: var(--color-blue);
+    box-shadow: 0 0 20px rgba(45, 95, 245, 0.6);
 }
 
 .players-section {
