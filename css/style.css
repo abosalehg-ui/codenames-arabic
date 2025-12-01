@@ -818,6 +818,27 @@ body {
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+    background: var(--color-card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    pointer-events: all;
+}
+
+.role-modal.hidden {
+    display: none !important;
+    pointer-events: none;
+}
+
+/* Overlay للخلفية عند فتح Role Selection */
+.role-modal::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: -1;
 }
 
 .role-header {
