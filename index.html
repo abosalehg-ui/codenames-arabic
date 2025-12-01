@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Names - النسخة العربية</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="loading-screen" class="screen active">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <h1>جارٍ إيقاظ خادم اللعبة...</h1>
+            <p>يرجى الانتظار بضع لحظات، قد يستغرق الأمر 30 ثانية.</p>
+        </div>
+    </div>
+
+    <div id="lobby-screen" class="screen hidden">
+        <div class="lobby-container">
+            <h1>أهلاً بك في Code Names العربية</h1>
+            
+            <div id="auth-section" class="card">
+                <h2>تسجيل الدخول / إنشاء حساب</h2>
+                <input type="text" id="username-input" placeholder="اسم المستخدم (للعرض)">
+                <input type="email" id="email-input" placeholder="البريد الإلكتروني">
+                <input type="password" id="password-input" placeholder="كلمة المرور">
+                <button id="auth-toggle">تسجيل جديد</button>
+                <button id="auth-submit" class="btn-primary">تسجيل الدخول</button>
+            </div>
+            
+            <div id="room-section" class="card hidden">
+                <input type="text" id="join-code" placeholder="أدخل كود الغرفة (AB12CD)">
+                <button id="btn-join" class="btn-secondary">انضمام</button>
+                <hr>
+                <input type="text" id="create-name" placeholder="اسم مخصص للغرفة (اختياري)">
+                <button id="btn-create" class="btn-primary">إنشاء غرفة جديدة</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        
+        <aside id="game-dashboard">
+            <div id="timer-display" class="timer-box">
+                <span id="current-turn-team">دور الفريق: الأحمـر</span>
+                <h2 id="timer-value">60</h2>
+            </div>
+
+            <div id="clue-info" class="card">
+                <h3>التلميح: <span id="clue-word">...</span></h3>
+                <p>محاولات متبقية: <span id="guesses-left">0</span></p>
+            </div>
+
+            <div id="history-log" class="card log-container">
+                <h3>سجل الكلمات</h3>
+                <ul id="log-list">
+                    </ul>
+            </div>
+            
+            <div id="controls-area">
+                <div id="spymaster-controls" class="hidden">
+                    <input type="text" id="clue-word-input" placeholder="أدخل التلميح">
+                    <input type="number" id="clue-count-input" placeholder="عدد الكلمات (1-9)">
+                    <button id="btn-give-clue" class="btn-primary">إعطاء التلميح</button>
+                </div>
+                <div id="guesser-controls" class="hidden">
+                    <button id="btn-pass-turn" class="btn-secondary">إنهاء الدور يدوياً</button>
+                </div>
+            </div>
+        </aside>
+
+        <main id="board-container">
+            <div id="game-board" class="grid-5x5">
+                </div>
+        </main>
+        
+    </div>
+    
+<div id="role-selection-area" class="card">
+    <h3>اختر دورك وفريقك</h3>
+    <p>الغرفة: <span id="room-code-display"></span></p>
+    <div id="team-selection">
+        <button class="btn-primary" data-team="RED" data-role="SPYMASTER">قائد أحمر</button>
+        <button class="btn-primary" data-team="RED" data-role="GUESSER">مخمن أحمر</button>
+        
+        <button class="btn-secondary" data-team="BLUE" data-role="SPYMASTER">قائد أزرق</button>
+        <button class="btn-secondary" data-team="BLUE" data-role="GUESSER">مخمن أزرق</button>
+    </div>
+    <hr>
+    <h4>اللاعبون في الغرفة:</h4>
+    <ul id="players-list">
+        </ul>
+    <button id="btn-start-game" class="btn-primary hidden">ابدأ اللعبة</button>
+</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
