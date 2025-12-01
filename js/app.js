@@ -3,7 +3,7 @@
 // =================================================================
 
 // ملاحظة: يجب تعديل هذا الرابط ليتطابق مع رابط خادم Render الخاص بك
-const BACKEND_URL = 'http://localhost:4000'; // استخدم رابط Render الخاص بك هنا (مثلاً: https://codenames-arabic.onrender.com)
+const BACKEND_URL = 'https://codenames-arabic-server.onrender.com'; // استخدم رابط Render الخاص بك هنا (مثلاً: https://codenames-arabic.onrender.com)
 
 let socket; // متغير لتخزين اتصال Socket.io
 let userState = { // حالة المستخدم المخزنة
