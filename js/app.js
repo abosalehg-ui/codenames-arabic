@@ -163,13 +163,20 @@ const wakeUpAndConnect = async () => {
     
     try {
         console.log('Attempting to wake up the Render server...');
-        const response = await fetch(`${BACKEND_URL}/`); 
+        const response = await fetch(`${BACKEND_URL}/`, {
+            method: 'GET',
+            signal: AbortSignal.timeout(30000) // timeout 30 seconds
+        }); 
 
         if (response.ok) {
             console.log('Server is awake! Establishing Socket.io connection...');
             
             socket = io(BACKEND_URL, {
-                auth: { token: userState.token } 
+                auth: { token: userState.token },
+                transports: ['websocket', 'polling'], // try websocket first
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000
             });
 
             setupSocketListeners(); 
@@ -182,8 +189,15 @@ const wakeUpAndConnect = async () => {
 
             socket.on('connect_error', (err) => {
                 console.error('Socket connection error:', err.message);
-                Modal.error('خطأ في الاتصال بالخادم. يرجى تحديث الصفحة.');
-                document.querySelector('.loader-content p').textContent = 'خطأ في الاتصال (Socket.io)';
+                Modal.error('خطأ في الاتصال بالخادم. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
+            });
+            
+            socket.on('disconnect', (reason) => {
+                console.warn('Socket disconnected:', reason);
+                if (reason === 'io server disconnect') {
+                    // الخادم قطع الاتصال، أعد الاتصال يدوياً
+                    socket.connect();
+                }
             });
 
         } else {
@@ -194,6 +208,13 @@ const wakeUpAndConnect = async () => {
         console.error('Failed to wake up server or connect:', error);
         document.querySelector('.loader-content h1').textContent = 'فشل الاتصال بالخادم 😢';
         document.querySelector('.loader-content p').textContent = 'يرجى التأكد من تشغيل الخادم والمحاولة لاحقاً.';
+        
+        // إضافة زر لإعادة المحاولة
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'btn btn-primary btn-large';
+        retryBtn.innerHTML = '<span>🔄 إعادة المحاولة</span>';
+        retryBtn.onclick = () => location.reload();
+        document.querySelector('.loader-content').appendChild(retryBtn);
     }
 };
 
@@ -210,6 +231,12 @@ const setupSocketListeners = () => {
     socket.on('roomCreated', (roomData) => {
         gameState = roomData;
         switchScreen('game-screen');
+        
+        // إظهار لوحة اختيار الأدوار بعد إنشاء الغرفة
+        setTimeout(() => {
+            document.getElementById('role-selection-area').classList.remove('hidden');
+        }, 300);
+        
         updateRoomLobbyUI(gameState);
         Modal.success(`تم إنشاء الغرفة بنجاح. الكود: ${roomData.code}`);
     });
@@ -221,9 +248,8 @@ const setupSocketListeners = () => {
     
     socket.on('gameStarted', (data) => {
         gameState = data;
-        switchScreen('game-screen');
         
-        const player = gameState.players.find(p => p.id === socket.id);
+        const player = gameState.players.find(p => p.socketId === socket.id || p.id === socket.id);
         if (player) {
             drawGameBoard(gameState.board, player.role);
             updateGameControls(player);
@@ -392,9 +418,6 @@ const updateRoomLobbyUI = (room) => {
             btnStart.classList.add('hidden');
         }
     }
-    
-    // إظهار لوحة اختيار الأدوار
-    document.getElementById('role-selection-area').classList.remove('hidden');
 };
 
 const handleCreateRoom = () => {
@@ -421,10 +444,19 @@ const handleJoinRoom = () => {
         Modal.warning('يرجى إدخال كود الغرفة.');
         return;
     }
+    
     socket.emit('joinRoom', { 
         roomCode, 
         username: userState.username,
         userId: userState.userId
+    });
+    
+    // الانتقال لشاشة اللعب وإظهار لوحة الأدوار بعد الانضمام الناجح
+    socket.once('roomUpdate', (players) => {
+        switchScreen('game-screen');
+        setTimeout(() => {
+            document.getElementById('role-selection-area').classList.remove('hidden');
+        }, 300);
     });
 };
 
