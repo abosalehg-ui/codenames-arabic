@@ -4,106 +4,275 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Names - النسخة العربية</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
+    <!-- ============================================ -->
+    <!-- MODAL SYSTEM - نظام النوافذ المنبثقة المخصص -->
+    <!-- ============================================ -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-icon" id="modal-icon">
+                    <!-- الأيقونة ستتغير حسب النوع -->
+                </div>
+                <h3 id="modal-title">عنوان الرسالة</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">محتوى الرسالة هنا</p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-btn-confirm" class="btn-modal btn-primary">حسناً</button>
+                <button id="modal-btn-cancel" class="btn-modal btn-secondary hidden">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- شاشة التحميل (Loading Screen) -->
+    <!-- ============================================ -->
     <div id="loading-screen" class="screen active">
         <div class="loader-content">
-            <div class="spinner"></div>
-            <h1>جارٍ إيقاظ خادم اللعبة...</h1>
-            <p>يرجى الانتظار بضع لحظات، قد يستغرق الأمر 30 ثانية.</p>
+            <div class="spinner-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <h1 class="glow-text">جارٍ إيقاظ خادم اللعبة...</h1>
+            <p class="loading-subtitle">يرجى الانتظار بضع لحظات، قد يستغرق الأمر 30 ثانية</p>
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- شاشة اللوبي (Lobby Screen) -->
+    <!-- ============================================ -->
     <div id="lobby-screen" class="screen hidden">
         <div class="lobby-container">
-            <h1>أهلاً بك في Code Names العربية</h1>
-            
-            <div id="auth-section" class="card">
-                <h2>تسجيل الدخول / إنشاء حساب</h2>
-                <input type="text" id="username-input" placeholder="اسم المستخدم (للعرض)">
-                <input type="email" id="email-input" placeholder="البريد الإلكتروني">
-                <input type="password" id="password-input" placeholder="كلمة المرور">
-                <button id="auth-toggle">تسجيل جديد</button>
-                <button id="auth-submit" class="btn-primary">تسجيل الدخول</button>
+            <!-- Header -->
+            <div class="lobby-header">
+                <h1 class="main-title">
+                    <span class="title-icon">🎯</span>
+                    Code Names
+                    <span class="title-subtitle">النسخة العربية</span>
+                </h1>
             </div>
             
-            <div id="room-section" class="card hidden">
-                <input type="text" id="join-code" placeholder="أدخل كود الغرفة (AB12CD)">
-                <button id="btn-join" class="btn-secondary">انضمام</button>
-                <hr>
-                <input type="text" id="create-name" placeholder="اسم مخصص للغرفة (اختياري)">
-                <button id="btn-create" class="btn-primary">إنشاء غرفة جديدة</button>
+            <!-- Auth Section -->
+            <div id="auth-section" class="card glass-card">
+                <div class="card-header">
+                    <h2>تسجيل الدخول / إنشاء حساب</h2>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" id="username-input" placeholder="اسم المستخدم (للعرض)">
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="email-input" placeholder="البريد الإلكتروني">
+                        <span class="input-icon">📧</span>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="password-input" placeholder="كلمة المرور">
+                        <span class="input-icon">🔒</span>
+                    </div>
+                    <div class="button-group">
+                        <button id="auth-submit" class="btn btn-primary btn-large">
+                            <span>تسجيل الدخول</span>
+                        </button>
+                        <button id="auth-toggle" class="btn btn-ghost">تسجيل جديد</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Room Section -->
+            <div id="room-section" class="card glass-card hidden">
+                <div class="card-header">
+                    <h2>انضم أو أنشئ غرفة</h2>
+                </div>
+                <div class="card-body">
+                    <div class="room-actions">
+                        <div class="action-block">
+                            <label class="label-text">انضمام لغرفة موجودة</label>
+                            <div class="input-group">
+                                <input type="text" id="join-code" placeholder="أدخل كود الغرفة (AB12CD)" maxlength="6">
+                                <button id="btn-join" class="btn btn-primary">
+                                    <span>انضمام</span>
+                                    <span class="btn-icon">→</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="divider">
+                            <span>أو</span>
+                        </div>
+                        
+                        <div class="action-block">
+                            <label class="label-text">إنشاء غرفة جديدة</label>
+                            <div class="input-group">
+                                <input type="text" id="create-name" placeholder="اسم مخصص للغرفة (اختياري)" maxlength="6">
+                                <button id="btn-create" class="btn btn-accent">
+                                    <span>إنشاء</span>
+                                    <span class="btn-icon">+</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- شاشة اللعب (Game Screen) -->
+    <!-- ============================================ -->
     <div id="game-screen" class="screen hidden">
         
+        <!-- Sidebar Dashboard -->
         <aside id="game-dashboard">
-            <div id="timer-display" class="timer-box">
-                <span id="current-turn-team">دور الفريق: الأحمـر</span>
-                <h2 id="timer-value">60</h2>
+            <!-- Timer -->
+            <div class="timer-card card glass-card">
+                <div class="timer-label" id="current-turn-team">دور الفريق الأحمر</div>
+                <div class="timer-value" id="timer-value">60</div>
+                <div class="timer-bar">
+                    <div class="timer-progress" id="timer-progress"></div>
+                </div>
             </div>
 
-            <div id="clue-info" class="card">
-                <h3>التلميح: <span id="clue-word">...</span></h3>
-                <p>محاولات متبقية: <span id="guesses-left">0</span></p>
+            <!-- Clue Info -->
+            <div id="clue-info" class="card glass-card">
+                <div class="clue-header">
+                    <h3>التلميح الحالي</h3>
+                </div>
+                <div class="clue-content">
+                    <div class="clue-word" id="clue-word">في انتظار التلميح...</div>
+                    <div class="clue-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">محاولات متبقية</span>
+                            <span class="stat-value" id="guesses-left">0</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div id="history-log" class="card log-container">
-                <h3>سجل الكلمات</h3>
-                <ul id="log-list">
+            <!-- Game Log -->
+            <div id="history-log" class="card glass-card">
+                <div class="log-header">
+                    <h3>📜 سجل الكلمات</h3>
+                </div>
+                <div class="log-body">
+                    <ul id="log-list" class="log-list">
+                        <!-- سيتم إضافة السجلات ديناميكياً -->
                     </ul>
+                </div>
             </div>
             
+            <!-- Controls -->
             <div id="controls-area">
-                <div id="spymaster-controls" class="hidden">
-                    <input type="text" id="clue-word-input" placeholder="أدخل التلميح">
-                    <input type="number" id="clue-count-input" placeholder="عدد الكلمات (1-9)">
-                    <button id="btn-give-clue" class="btn-primary">إعطاء التلميح</button>
+                <div id="spymaster-controls" class="controls-card card glass-card hidden">
+                    <h4>🎯 كن القائد</h4>
+                    <div class="input-group">
+                        <input type="text" id="clue-word-input" placeholder="أدخل التلميح">
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="clue-count-input" placeholder="عدد الكلمات (1-9)" min="1" max="9">
+                    </div>
+                    <button id="btn-give-clue" class="btn btn-accent btn-large">
+                        <span>إعطاء التلميح</span>
+                        <span class="btn-icon">✨</span>
+                    </button>
                 </div>
-                <div id="guesser-controls" class="hidden">
-                    <button id="btn-pass-turn" class="btn-secondary">إنهاء الدور يدوياً</button>
+                
+                <div id="guesser-controls" class="controls-card card glass-card hidden">
+                    <button id="btn-pass-turn" class="btn btn-danger btn-large">
+                        <span>إنهاء الدور يدوياً</span>
+                        <span class="btn-icon">⏭</span>
+                    </button>
                 </div>
             </div>
         </aside>
 
+        <!-- Game Board -->
         <main id="board-container">
-            <div id="game-board" class="grid-5x5">
+            <div class="board-header">
+                <div class="team-score team-red">
+                    <span class="score-label">🔴 الأحمر</span>
+                    <span class="score-value" id="red-remaining">9</span>
                 </div>
+                <div class="board-title">لوحة اللعب</div>
+                <div class="team-score team-blue">
+                    <span class="score-label">🔵 الأزرق</span>
+                    <span class="score-value" id="blue-remaining">8</span>
+                </div>
+            </div>
+            
+            <div id="game-board" class="game-grid">
+                <!-- سيتم إنشاء البطاقات ديناميكياً -->
+            </div>
         </main>
         
     </div>
     
-<div id="role-selection-area" class="card">
-    <h3>اختر دورك وفريقك</h3>
-    <p>الغرفة: <span id="room-code-display"></span></p>
-    <div id="team-selection">
-        <button class="btn-primary" data-team="RED" data-role="SPYMASTER">قائد أحمر</button>
-        <button class="btn-primary" data-team="RED" data-role="GUESSER">مخمن أحمر</button>
+    <!-- ============================================ -->
+    <!-- لوحة اختيار الأدوار (Role Selection) -->
+    <!-- ============================================ -->
+    <div id="role-selection-area" class="card glass-card role-modal">
+        <div class="role-header">
+            <h3>⚔️ اختر دورك وفريقك</h3>
+            <div class="room-code-badge">
+                <span>كود الغرفة:</span>
+                <strong id="room-code-display">------</strong>
+            </div>
+        </div>
         
-        <button class="btn-secondary" data-team="BLUE" data-role="SPYMASTER">قائد أزرق</button>
-        <button class="btn-secondary" data-team="BLUE" data-role="GUESSER">مخمن أزرق</button>
+        <div id="team-selection" class="team-grid">
+            <button class="role-btn role-btn-red" data-team="RED" data-role="SPYMASTER">
+                <span class="role-icon">👑</span>
+                <span class="role-name">قائد أحمر</span>
+            </button>
+            <button class="role-btn role-btn-red-light" data-team="RED" data-role="GUESSER">
+                <span class="role-icon">🎯</span>
+                <span class="role-name">مخمن أحمر</span>
+            </button>
+            
+            <button class="role-btn role-btn-blue" data-team="BLUE" data-role="SPYMASTER">
+                <span class="role-icon">👑</span>
+                <span class="role-name">قائد أزرق</span>
+            </button>
+            <button class="role-btn role-btn-blue-light" data-team="BLUE" data-role="GUESSER">
+                <span class="role-icon">🎯</span>
+                <span class="role-name">مخمن أزرق</span>
+            </button>
+        </div>
+        
+        <div class="players-section">
+            <h4>👥 اللاعبون في الغرفة</h4>
+            <ul id="players-list" class="players-list">
+                <!-- سيتم إضافة اللاعبين ديناميكياً -->
+            </ul>
+        </div>
+        
+        <button id="btn-start-game" class="btn btn-success btn-large hidden">
+            <span>🚀 ابدأ اللعبة</span>
+        </button>
     </div>
-    <hr>
-    <h4>اللاعبون في الغرفة:</h4>
-    <ul id="players-list">
-        </ul>
-    <button id="btn-start-game" class="btn-primary hidden">ابدأ اللعبة</button>
-</div>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="js/app.js"></script>
 
-    </footer>
-        <div class="container">
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
             <p>&copy; 2024 Code Names العربية. جميع الحقوق محفوظة.</p>
-            <p>تطوير: **عبدالكريم العبود** | التواصل: **ABO.SALEH.G@GMAIL.COM**</p>
+            <p class="footer-credits">تطوير: <strong>عبدالكريم العبود</strong> | التواصل: <a href="mailto:ABO.SALEH.G@GMAIL.COM">ABO.SALEH.G@GMAIL.COM</a></p>
         </div>
     </footer>
     
+    <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="js/app.js"></script>
 </body>
