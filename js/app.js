@@ -244,6 +244,14 @@ const setupSocketListeners = () => {
     socket.on('roomUpdate', (players) => {
         gameState.players = players;
         updateRoomLobbyUI(gameState);
+        
+        // التحقق إذا كان المستخدم الحالي اختار دوره
+        const currentPlayer = players.find(p => p.id === socket.id);
+        if (currentPlayer && currentPlayer.team && currentPlayer.role) {
+            console.log('Player role confirmed:', currentPlayer);
+            // يمكن إخفاء النافذة هنا إذا أردت
+            // document.getElementById('role-selection-area').classList.add('hidden');
+        }
     });
     
     socket.on('gameStarted', (data) => {
@@ -418,6 +426,42 @@ const updateRoomLobbyUI = (room) => {
             btnStart.classList.add('hidden');
         }
     }
+    
+    // تحديث visual state للأزرار
+    updateRoleButtonsState(room.players);
+};
+
+// دالة جديدة لتحديث حالة أزرار الأدوار
+const updateRoleButtonsState = (players) => {
+    // إزالة selected class من كل الأزرار أولاً
+    document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // تحديد اللاعب الحالي
+    const currentPlayer = players.find(p => p.id === socket.id);
+    
+    // إضافة selected class للزر المختار من اللاعب الحالي
+    if (currentPlayer && currentPlayer.team && currentPlayer.role) {
+        const selector = `[data-team="${currentPlayer.team}"][data-role="${currentPlayer.role}"]`;
+        const selectedBtn = document.querySelector(selector);
+        if (selectedBtn) {
+            selectedBtn.classList.add('selected');
+        }
+    }
+    
+    // تعطيل الأزرار المأخوذة من لاعبين آخرين (للقادة فقط)
+    players.forEach(p => {
+        if (p.id !== socket.id && p.team && p.role === 'SPYMASTER') {
+            const selector = `[data-team="${p.team}"][data-role="SPYMASTER"]`;
+            const btn = document.querySelector(selector);
+            if (btn) {
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+                btn.style.pointerEvents = 'none';
+            }
+        }
+    });
 };
 
 const handleCreateRoom = () => {
@@ -461,11 +505,20 @@ const handleJoinRoom = () => {
 };
 
 const handleRoleSelection = (e) => {
-    const team = e.target.closest('[data-team]')?.getAttribute('data-team');
-    const role = e.target.closest('[data-role]')?.getAttribute('data-role');
+    const button = e.target.closest('[data-team]');
+    if (!button) return;
+    
+    const team = button.getAttribute('data-team');
+    const role = button.getAttribute('data-role');
     
     if (team && role) {
         socket.emit('setRole', { team, role });
+        
+        // إظهار feedback للمستخدم
+        Modal.success(`تم اختيار: ${role === 'SPYMASTER' ? 'قائد' : 'مخمن'} ${team === 'RED' ? 'أحمر' : 'أزرق'}`);
+        
+        // إخفاء النافذة بعد الاختيار (اختياري)
+        // document.getElementById('role-selection-area').classList.add('hidden');
     }
 };
 
