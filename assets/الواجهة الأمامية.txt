@@ -1,6 +1,0 @@
-/codenames-arabic-frontend
-├── index.html            (الهيكل الرئيسي)
-├── css/
-│   └── style.css         (التنسيقات الجذابة)
-└── js/
-    └── app.js            (منطق اللعبة والـ Socket.io)
