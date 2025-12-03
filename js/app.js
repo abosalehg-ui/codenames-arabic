@@ -10,6 +10,24 @@ let userState = {
 let gameState = {};
 
 // =================================================================
+// 🎶 دوال تشغيل الأصوات
+// =================================================================
+
+/**
+ * دالة لتشغيل صوت معين
+ * @param {string} name - اسم ملف الصوت (بدون امتداد، مثال: 'correct')
+ */
+const playSound = (name) => {
+    // التأكد من أن المتصفح يدعم Audio
+    if (typeof Audio !== 'undefined') {
+        // يجب أن تكون الملفات في المسار: assets/sounds/
+        const audio = new Audio(`./assets/sounds/${name}.mp3`);
+        // استخدام catch لتجنب الأخطاء إذا رفض المتصفح التشغيل قبل تفاعل المستخدم
+        audio.play().catch(e => console.warn("Could not play sound:", e.message));
+    }
+};
+
+// =================================================================
 // 🎭 MODAL SYSTEM - نظام النوافذ المنبثقة المخصص
 // =================================================================
 
@@ -232,6 +250,9 @@ const setupSocketListeners = () => {
         gameState = roomData;
         switchScreen('game-screen');
         
+        // 🎶 تشغيل صوت عند إنشاء الغرفة
+        playSound('connected'); 
+        
         // إظهار لوحة اختيار الأدوار بعد إنشاء الغرفة
         setTimeout(() => {
             document.getElementById('role-selection-area').classList.remove('hidden');
@@ -245,17 +266,17 @@ const setupSocketListeners = () => {
         gameState.players = players;
         updateRoomLobbyUI(gameState);
         
-        // التحقق إذا كان المستخدم الحالي اختار دوره
         const currentPlayer = players.find(p => p.id === socket.id);
         if (currentPlayer && currentPlayer.team && currentPlayer.role) {
             console.log('Player role confirmed:', currentPlayer);
-            // يمكن إخفاء النافذة هنا إذا أردت
-            // document.getElementById('role-selection-area').classList.add('hidden');
         }
     });
     
     socket.on('gameStarted', (data) => {
         gameState = data;
+        
+        // 🎶 تشغيل صوت بدء اللعبة
+        playSound('game_start'); 
         
         const player = gameState.players.find(p => p.socketId === socket.id || p.id === socket.id);
         if (player) {
@@ -283,6 +304,20 @@ const setupSocketListeners = () => {
             cardElement.classList.add('revealed', card.type);
             cardElement.style.backgroundColor = getCardColor(card.type);
             
+            // 🎶 منطق تشغيل الأصوات حسب نوع البطاقة
+            switch (card.type) {
+                case 'RED':
+                case 'BLUE':
+                    playSound('correct'); 
+                    break;
+                case 'INNOCENT':
+                    playSound('wrong'); 
+                    break;
+                case 'ASSASSIN':
+                    playSound('assassin_hit'); 
+                    break;
+            }
+            
             // إضافة للسجل
             addToLog(card.word, card.type);
         }
@@ -292,6 +327,8 @@ const setupSocketListeners = () => {
 
     socket.on('clueGiven', (data) => {
         document.getElementById('clue-word').textContent = data.clue;
+        // 🎶 تشغيل صوت عند إعطاء التلميح (اختياري)
+        playSound('clue_given');
         Modal.info(`التلميح: "${data.clue}" - عدد الكلمات: ${data.count}`);
     });
 
@@ -427,21 +464,19 @@ const updateRoomLobbyUI = (room) => {
         }
     }
     
-    // تحديث visual state للأزرار
     updateRoleButtonsState(room.players);
 };
 
-// دالة جديدة لتحديث حالة أزرار الأدوار
 const updateRoleButtonsState = (players) => {
-    // إزالة selected class من كل الأزرار أولاً
     document.querySelectorAll('.role-btn').forEach(btn => {
         btn.classList.remove('selected');
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        btn.style.pointerEvents = 'auto';
     });
     
-    // تحديد اللاعب الحالي
     const currentPlayer = players.find(p => p.id === socket.id);
     
-    // إضافة selected class للزر المختار من اللاعب الحالي
     if (currentPlayer && currentPlayer.team && currentPlayer.role) {
         const selector = `[data-team="${currentPlayer.team}"][data-role="${currentPlayer.role}"]`;
         const selectedBtn = document.querySelector(selector);
@@ -450,7 +485,6 @@ const updateRoleButtonsState = (players) => {
         }
     }
     
-    // تعطيل الأزرار المأخوذة من لاعبين آخرين (للقادة فقط)
     players.forEach(p => {
         if (p.id !== socket.id && p.team && p.role === 'SPYMASTER') {
             const selector = `[data-team="${p.team}"][data-role="SPYMASTER"]`;
@@ -495,7 +529,6 @@ const handleJoinRoom = () => {
         userId: userState.userId
     });
     
-    // الانتقال لشاشة اللعب وإظهار لوحة الأدوار بعد الانضمام الناجح
     socket.once('roomUpdate', (players) => {
         switchScreen('game-screen');
         setTimeout(() => {
@@ -514,11 +547,7 @@ const handleRoleSelection = (e) => {
     if (team && role) {
         socket.emit('setRole', { team, role });
         
-        // إظهار feedback للمستخدم
         Modal.success(`تم اختيار: ${role === 'SPYMASTER' ? 'قائد' : 'مخمن'} ${team === 'RED' ? 'أحمر' : 'أزرق'}`);
-        
-        // إخفاء النافذة بعد الاختيار (اختياري)
-        // document.getElementById('role-selection-area').classList.add('hidden');
     }
 };
 
@@ -594,17 +623,14 @@ const updateGameControls = (player) => {
 };
 
 const updateGameUI = () => {
-    // تحديث التلميح
     if (gameState.clue) {
         document.getElementById('clue-word').textContent = gameState.clue;
     }
     
-    // تحديث المحاولات المتبقية
     if (gameState.guessesLeft !== undefined) {
         document.getElementById('guesses-left').textContent = gameState.guessesLeft;
     }
     
-    // تحديث الدور الحالي
     if (gameState.currentTurn) {
         const turnText = gameState.currentTurn === 'RED' ? 'دور الفريق الأحمر' : 'دور الفريق الأزرق';
         document.getElementById('current-turn-team').textContent = turnText;
@@ -618,6 +644,9 @@ const updateGameUI = () => {
             title: '🎉 انتهت اللعبة!',
             message: `فاز ${winnerText}! تهانينا! 🏆`
         });
+        
+        // 🎶 تشغيل صوت الفوز
+        playSound('win_game');
     }
 };
 
@@ -655,13 +684,11 @@ const addToLog = (word, type) => {
     li.textContent = `${typeEmoji[type] || ''} ${word}`;
     logList.insertBefore(li, logList.firstChild);
     
-    // الاحتفاظ بآخر 10 سجلات فقط
     while (logList.children.length > 10) {
         logList.removeChild(logList.lastChild);
     }
 };
 
-// معالجة إعطاء التلميح
 const handleGiveClue = () => {
     const clueWord = document.getElementById('clue-word-input').value.trim();
     const clueCount = parseInt(document.getElementById('clue-count-input').value);
@@ -673,12 +700,10 @@ const handleGiveClue = () => {
     
     socket.emit('giveClue', { clue: clueWord, count: clueCount });
     
-    // تفريغ الحقول
     document.getElementById('clue-word-input').value = '';
     document.getElementById('clue-count-input').value = '';
 };
 
-// معالجة إنهاء الدور
 const handleEndTurn = () => {
     Modal.confirm(
         'هل أنت متأكد من إنهاء الدور؟',
@@ -693,13 +718,10 @@ const handleEndTurn = () => {
 // =================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // تهيئة نظام Modal
     Modal.init();
     
-    // بدء عملية الاتصال
     wakeUpAndConnect(); 
 
-    // ربط أزرار المصادقة
     const authSubmitButton = document.getElementById('auth-submit');
     const authToggleButton = document.getElementById('auth-toggle');
 
@@ -725,7 +747,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ربط أزرار الغرفة
     const btnCreate = document.getElementById('btn-create');
     const btnJoin = document.getElementById('btn-join');
     const btnStartGame = document.getElementById('btn-start-game');
@@ -734,13 +755,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnJoin) btnJoin.addEventListener('click', handleJoinRoom);
     if (btnStartGame) btnStartGame.addEventListener('click', handleStartGame);
     
-    // ربط أزرار اختيار الدور
     const teamSelectionDiv = document.getElementById('team-selection');
     if (teamSelectionDiv) {
         teamSelectionDiv.addEventListener('click', handleRoleSelection);
     }
     
-    // ربط أزرار اللعبة
     const btnGiveClue = document.getElementById('btn-give-clue');
     const btnPassTurn = document.getElementById('btn-pass-turn');
     
