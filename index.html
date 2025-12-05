@@ -967,5 +967,31 @@ $('modal-confirm').addEventListener('click', () => {
     Modal.hide();
 });
 
+// Close modal on overlay click
+$('modal').addEventListener('click', (e) => {
+    if (e.target === $('modal')) {
+        Modal.hide();
+    }
+});
+
 // Wake up server on load
 fetch(`${BACKEND_URL}/`).catch(() => {});
+
+// Enter key shortcuts
+document.addEventListener('DOMContentLoaded', () => {
+    $('username-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') $('btn-enter-game').click();
+    });
+    
+    $('join-room-code').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') $('btn-join-room').click();
+    });
+    
+    $('clue-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') $('btn-give-clue').click();
+    });
+});
+</script>
+
+</body>
+</html>
