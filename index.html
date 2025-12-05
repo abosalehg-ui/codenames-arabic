@@ -977,19 +977,17 @@ $('modal').addEventListener('click', (e) => {
 // Wake up server on load
 fetch(`${BACKEND_URL}/`).catch(() => {});
 
-// Enter key shortcuts
-document.addEventListener('DOMContentLoaded', () => {
-    $('username-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') $('btn-enter-game').click();
-    });
-    
-    $('join-room-code').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') $('btn-join-room').click();
-    });
-    
-    $('clue-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') $('btn-give-clue').click();
-    });
+// Enter key shortcuts - added directly
+$('username-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') $('btn-enter-game').click();
+});
+
+$('join-room-code').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') $('btn-join-room').click();
+});
+
+$('clue-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') $('btn-give-clue').click();
 });
 </script>
 
