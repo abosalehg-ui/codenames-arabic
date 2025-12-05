@@ -2,992 +2,506 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0F1419">
-    <title>Code Names - النسخة العربية</title>
+    <meta name="theme-color" content="#1a1d29">
+    <title>Codenames العربية - لعبة أسماء الشفرة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-/* ============================================ */
-/* 🎨 CSS VARIABLES - Mobile-First */
-/* ============================================ */
-:root {
-    /* Colors */
-    --color-red: #FF3B5C;
-    --color-red-dark: #E5315A;
-    --color-blue: #2D5FF5;
-    --color-blue-dark: #1E4FE0;
-    
-    --color-bg: #0F1419;
-    --color-bg-light: #1A1F2E;
-    --color-card: #252B3A;
-    --color-card-hover: #2E3548;
-    
-    --color-accent: #FFB800;
-    --color-success: #00D9A3;
-    --color-danger: #FF3B5C;
-    --color-assassin: #13151C;
-    --color-innocent: #3D4556;
-    
-    --color-text: #FFFFFF;
-    --color-text-secondary: #A0A8B8;
-    --color-text-muted: #6B7280;
-    
-    /* Spacing - Mobile-First */
-    --space-xs: 8px;
-    --space-sm: 12px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --space-xl: 32px;
-    
-    /* Touch Areas */
-    --touch-min: 48px;
-    --touch-comfortable: 56px;
-    
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
-    --radius-full: 9999px;
-    
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-    
-    /* Transitions */
-    --transition-fast: 150ms ease;
-    --transition-normal: 250ms ease;
-    --transition-slow: 400ms ease;
-    
-    /* Safe Areas (for notch devices) */
-    --safe-top: env(safe-area-inset-top, 0);
-    --safe-bottom: env(safe-area-inset-bottom, 0);
-    --safe-left: env(safe-area-inset-left, 0);
-    --safe-right: env(safe-area-inset-right, 0);
-}
-
-/* ============================================ */
-/* 🌐 GLOBAL RESET & BASE STYLES */
-/* ============================================ */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html {
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-    font-family: 'Cairo', sans-serif;
-    background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-light) 100%);
-    background-attachment: fixed;
-    color: var(--color-text);
-    overflow-x: hidden;
-    line-height: 1.6;
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    position: relative;
-}
-
-/* Remove iOS input zoom */
-input, textarea, select {
-    font-size: 16px;
-}
-
-/* ============================================ */
-/* 📱 SCREEN MANAGEMENT */
-/* ============================================ */
-.screen {
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    display: none;
-    flex-direction: column;
-    padding: var(--space-md);
-    padding-top: calc(var(--safe-top) + var(--space-md));
-    padding-bottom: padding-bottom: calc(var(--safe-bottom) + 80px);  /* 80px = ارتفاع الـ Footer تقريباً */
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity var(--transition-normal), transform var(--transition-normal);
-}
-
-.screen.active {
-    display: flex;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* ============================================ */
-/* 🎯 SPLASH SCREEN */
-/* ============================================ */
-#splash-screen {
-    justify-content: center;
-    align-items: center;
-    background: radial-gradient(circle at center, var(--color-bg-light) 0%, var(--color-bg) 100%);
-}
-
-.splash-logo {
-    font-size: clamp(3rem, 15vw, 5rem);
-    animation: pulse 2s infinite;
-}
-
-.splash-title {
-    font-size: clamp(2rem, 8vw, 3rem);
-    font-weight: 900;
-    margin-top: var(--space-lg);
-    background: linear-gradient(135deg, var(--color-blue), var(--color-accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-align: center;
-}
-
-.splash-subtitle {
-    font-size: 1.2rem;
-    color: var(--color-text-secondary);
-    margin-top: var(--space-sm);
-    text-align: center;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-/* ============================================ */
-/* 📖 ONBOARDING SCREENS */
-/* ============================================ */
-#onboarding-screen {
-    padding: 0;
-    position: relative;
-}
-
-.onboarding-container {
-    display: flex;
-    overflow-x: hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    height: 100vh;
-    height: -webkit-fill-available;
-}
-
-.onboarding-slide {
-    min-width: 100%;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: var(--space-xl);
-    text-align: center;
-}
-
-.onboarding-icon {
-    font-size: 6rem;
-    margin-bottom: var(--space-lg);
-}
-
-.onboarding-slide h2 {
-    font-size: clamp(1.8rem, 6vw, 2.5rem);
-    font-weight: 800;
-    margin-bottom: var(--space-md);
-}
-
-.onboarding-slide p {
-    font-size: 1.1rem;
-    color: var(--color-text-secondary);
-    line-height: 1.8;
-    max-width: 400px;
-}
-
-.onboarding-dots {
-    position: absolute;
-    bottom: calc(var(--safe-bottom) + 120px);
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: var(--space-sm);
-}
-
-.onboarding-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--radius-full);
-    background: var(--color-text-muted);
-    transition: all var(--transition-fast);
-}
-
-.onboarding-dot.active {
-    width: 24px;
-    background: var(--color-blue);
-}
-
-.onboarding-footer {
-    position: absolute;
-    bottom: calc(var(--safe-bottom) + var(--space-lg));
-    left: var(--space-md);
-    right: var(--space-md);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.btn-skip {
-    color: var(--color-text-secondary);
-    font-size: 1rem;
-    font-weight: 600;
-    background: none;
-    border: none;
-    padding: var(--space-sm);
-    cursor: pointer;
-}
-
-/* ============================================ */
-/* 🎨 BUTTONS - Mobile-First */
-/* ============================================ */
-.btn {
-    min-height: var(--touch-comfortable);
-    padding: 0 var(--space-lg);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 1.1rem;
-    font-weight: 700;
-    font-family: 'Cairo', sans-serif;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-sm);
-    transition: all var(--transition-fast);
-    position: relative;
-    overflow: hidden;
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.btn:active {
-    transform: scale(0.97);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
-    color: white;
-    box-shadow: var(--shadow-md);
-}
-
-.btn-accent {
-    background: linear-gradient(135deg, var(--color-accent), #FFA500);
-    color: var(--color-bg);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-success {
-    background: linear-gradient(135deg, var(--color-success), #00B887);
-    color: white;
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, var(--color-danger), var(--color-red-dark));
-    color: white;
-}
-
-.btn-ghost {
-    background: transparent;
-    color: var(--color-text-secondary);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-large {
-    min-height: var(--touch-comfortable);
-    font-size: 1.2rem;
-    padding: 0 var(--space-xl);
-}
-
-.btn-full {
-    width: 100%;
-}
-
-.btn-icon {
-    font-size: 1.4rem;
-}
-
-/* ============================================ */
-/* 🔐 AUTH SCREEN */
-/* ============================================ */
-.auth-header {
-    text-align: center;
-    margin-bottom: var(--space-xl);
-}
-
-.auth-header h1 {
-    font-size: clamp(2rem, 8vw, 3rem);
-    font-weight: 900;
-    margin-bottom: var(--space-sm);
-}
-
-.auth-subtitle {
-    font-size: 1.1rem;
-    color: var(--color-text-secondary);
-}
-
-.card {
-    background: var(--color-card);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    margin-bottom: var(--space-md);
-    box-shadow: var(--shadow-md);
-}
-
-.input-group {
-    margin-bottom: var(--space-md);
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-xs);
-}
-
-.input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.input-icon {
-    position: absolute;
-    right: var(--space-md);
-    font-size: 1.3rem;
-    color: var(--color-text-muted);
-    pointer-events: none;
-}
-
-input {
-    width: 100%;
-    min-height: var(--touch-comfortable);
-    padding: 0 var(--space-xl) 0 var(--space-md);
-    background: var(--color-bg-light);
-    border: 2px solid transparent;
-    border-radius: var(--radius-md);
-    color: var(--color-text);
-    font-size: 1rem;
-    font-family: 'Cairo', sans-serif;
-    transition: all var(--transition-fast);
-}
-
-input:focus {
-    outline: none;
-    border-color: var(--color-blue);
-    background: var(--color-card-hover);
-}
-
-.button-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-/* ============================================ */
-/* 🏠 LOBBY SCREEN */
-/* ============================================ */
-.lobby-actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.action-card {
-    background: var(--color-card);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    box-shadow: var(--shadow-md);
-}
-
-.action-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-md);
-}
-
-.action-icon {
-    font-size: 2.5rem;
-}
-
-.action-header h3 {
-    font-size: 1.4rem;
-    font-weight: 700;
-}
-
-.action-description {
-    font-size: 0.95rem;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-md);
-    line-height: 1.6;
-}
-
-/* ============================================ */
-/* ⏳ WAITING ROOM */
-/* ============================================ */
-.waiting-header {
-    text-align: center;
-    margin-bottom: var(--space-xl);
-}
-
-.room-code-display {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
-    background: var(--color-card);
-    border-radius: var(--radius-lg);
-    margin-top: var(--space-md);
-}
-
-.room-code-label {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-}
-
-.room-code-value {
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--color-accent);
-    letter-spacing: 3px;
-}
-
-.team-selection {
-    margin-bottom: var(--space-xl);
-}
-
-.team-selection h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: var(--space-md);
-}
-
-.role-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
-}
-
-.role-btn {
-    min-height: 120px;
-    padding: var(--space-md);
-    border: 3px solid transparent;
-    border-radius: var(--radius-lg);
-    background: var(--color-card);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-sm);
-    touch-action: manipulation;
-}
-
-.role-btn:active {
-    transform: scale(0.97);
-}
-
-.role-icon-large {
-    font-size: 2.5rem;
-}
-
-.role-name {
-    font-size: 1rem;
-    font-weight: 700;
-    text-align: center;
-}
-
-.role-btn-red {
-    border-color: var(--color-red);
-}
-
-.role-btn-red.selected {
-    background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
-    box-shadow: 0 0 20px rgba(255, 59, 92, 0.6);
-}
-
-.role-btn-blue {
-    border-color: var(--color-blue);
-}
-
-.role-btn-blue.selected {
-    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
-    box-shadow: 0 0 20px rgba(45, 95, 245, 0.6);
-}
-
-.players-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-}
-
-.players-list li {
-    padding: var(--space-md);
-    background: var(--color-card);
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-/* ============================================ */
-/* 🎮 GAME SCREEN - Mobile Portrait */
-/* ============================================ */
-#game-screen {
-    padding: 0;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 0;
-}
-
-.game-header {
-    background: var(--color-card);
-    padding: var(--space-md);
-    padding-top: calc(var(--safe-top) + var(--space-md));
-    box-shadow: var(--shadow-md);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.game-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-sm);
-}
-
-.team-score {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-
-.score-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.score-value {
-    font-size: 2rem;
-    font-weight: 900;
-}
-
-.team-red .score-value {
-    color: var(--color-red);
-}
-
-.team-blue .score-value {
-    color: var(--color-blue);
-}
-
-.turn-indicator {
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-}
-
-.clue-display {
-    background: var(--color-bg-light);
-    border-radius: var(--radius-md);
-    padding: var(--space-md);
-    text-align: center;
-    margin-top: var(--space-sm);
-}
-
-.clue-label {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    margin-bottom: 4px;
-}
-
-.clue-word {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--color-accent);
-}
-
-.clue-count {
-    font-size: 1.2rem;
-    color: var(--color-text-secondary);
-    margin-top: 4px;
-}
-
-.game-board-container {
-    padding: var(--space-md);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.game-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: var(--space-sm);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.card-word {
-    aspect-ratio: 1;
-    background: var(--color-card);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.9rem;
-    font-weight: 700;
-    padding: var(--space-xs);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    touch-action: manipulation;
-}
-
-.card-word:active:not(.revealed) {
-    transform: scale(0.95);
-}
-
-.card-word.revealed {
-    cursor: not-allowed;
-}
-
-.card-word.RED {
-    background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
-    color: white;
-    border-color: var(--color-red);
-}
-
-.card-word.BLUE {
-    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
-    color: white;
-    border-color: var(--color-blue);
-}
-
-.card-word.INNOCENT {
-    background: var(--color-innocent);
-    color: var(--color-text-secondary);
-}
-
-.card-word.ASSASSIN {
-    background: linear-gradient(135deg, var(--color-assassin), #000000);
-    color: white;
-    border-color: var(--color-danger);
-    animation: assassinPulse 1s infinite;
-}
-
-@keyframes assassinPulse {
-    0%, 100% { box-shadow: 0 4px 20px rgba(255, 59, 92, 0.8); }
-    50% { box-shadow: 0 4px 30px rgba(255, 59, 92, 1); }
-}
-
-.game-controls {
-    background: var(--color-card);
-    padding: var(--space-md);
-    padding-bottom: calc(var(--safe-bottom) + var(--space-md));
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
-    position: sticky;
-    bottom: 0;
-}
-
-.control-input-group {
-    display: flex;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-sm);
-}
-
-.control-input {
-    flex: 1;
-}
-
-/* ============================================ */
-/* 🔄 LANDSCAPE MODE */
-/* ============================================ */
-@media (orientation: landscape) and (max-height: 600px) {
-    #game-screen {
-        grid-template-columns: 1fr 2fr;
-        grid-template-rows: 1fr;
-    }
-    
-    .game-header {
-        position: static;
-    }
-    
-    .game-board-container {
-        grid-column: 2;
-        grid-row: 1;
-    }
-    
-    .game-controls {
-        position: static;
-        grid-column: 1;
-        grid-row: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    
-    .game-grid {
-        gap: var(--space-xs);
-    }
-    
-    .card-word {
-        font-size: 0.75rem;
-    }
-}
-
-/* ============================================ */
-/* 📱 TABLET & LARGER SCREENS */
-/* ============================================ */
-@media (min-width: 768px) {
-    .screen {
-        padding: var(--space-xl);
-    }
-    
-    .card {
-        max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
-    .role-grid {
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
-    .game-grid {
-        gap: var(--space-md);
-        max-width: 700px;
-    }
-    
-    .card-word {
-        font-size: 1.1rem;
-    }
-}
-
-/* ============================================ */
-/* 🖥️ DESKTOP */
-/* ============================================ */
-@media (min-width: 1024px) {
-    #game-screen {
-        grid-template-columns: 350px 1fr;
-        grid-template-rows: 1fr;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-    
-    .game-header {
-        grid-column: 1;
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        overflow-y: auto;
-    }
-    
-    .game-board-container {
-        grid-column: 2;
-    }
-    
-    .game-controls {
-        grid-column: 1;
-        position: static;
-    }
-}
-
-/* ============================================ */
-/* 🎭 MODAL */
-/* ============================================ */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--transition-normal);
-    padding: var(--space-md);
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.modal-content {
-    background: var(--color-card);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    max-width: 400px;
-    width: 100%;
-    box-shadow: var(--shadow-lg);
-    text-align: center;
-    transform: scale(0.9);
-    transition: transform var(--transition-normal);
-}
-
-.modal-overlay.active .modal-content {
-    transform: scale(1);
-}
-
-.modal-icon {
-    font-size: 4rem;
-    margin-bottom: var(--space-md);
-}
-
-.modal-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: var(--space-sm);
-}
-
-.modal-message {
-    font-size: 1rem;
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-    margin-bottom: var(--space-lg);
-}
-
-.modal-actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-}
-
-/* ============================================ */
-/* 🎯 UTILITY CLASSES */
-/* ============================================ */
-.hidden {
-    display: none !important;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.mt-auto {
-    margin-top: auto;
-}
-
-.mb-md {
-    margin-bottom: var(--space-md);
-}
-
-.mb-lg {
-    margin-bottom: var(--space-lg);
-}
-
-.mb-xl {
-    margin-bottom: var(--space-xl);
-}
+        /* ============================================ */
+        /* 🎨 VARIABLES & RESET */
+        /* ============================================ */
+        :root {
+            --color-red: #d32f2f;
+            --color-red-dark: #b71c1c;
+            --color-blue: #1976d2;
+            --color-blue-dark: #0d47a1;
+            --color-beige: #ddc9a3;
+            --color-black: #212121;
+            
+            --bg-primary: #1a1d29;
+            --bg-secondary: #252936;
+            --bg-card: #2d3142;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #b0b3c1;
+            --text-muted: #6c6f85;
+            
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ============================================ */
+        /* 📱 SCREENS */
+        /* ============================================ */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: var(--spacing-lg);
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============================================ */
+        /* 🏠 HOME SCREEN */
+        /* ============================================ */
+        .home-container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-lg);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, var(--color-blue), var(--color-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .input-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+            text-align: right;
+        }
+
+        input {
+            width: 100%;
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--color-blue);
+            background: var(--bg-primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
+            color: white;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--bg-card);
+        }
+
+        /* ============================================ */
+        /* 🎮 GAME SCREEN */
+        /* ============================================ */
+        #game-screen {
+            padding: 0;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--spacing-lg);
+            height: 100vh;
+            padding: var(--spacing-lg);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            overflow-y: auto;
+        }
+
+        .score-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+
+        .score-team {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .team-red {
+            color: var(--color-red);
+        }
+
+        .team-blue {
+            color: var(--color-blue);
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+        }
+
+        .clue-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+        }
+
+        .clue-header {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .clue-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--color-blue);
+            background: var(--bg-secondary);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .clue-count {
+            font-size: 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Board */
+        .board-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .turn-indicator {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--spacing-sm);
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        .word-card {
+            aspect-ratio: 2/1;
+            background: var(--bg-card);
+            border: 3px solid var(--bg-secondary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: var(--spacing-sm);
+            text-align: center;
+        }
+
+        .word-card:hover:not(.revealed) {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--color-blue);
+        }
+
+        .word-card.revealed {
+            cursor: not-allowed;
+        }
+
+        .word-card.RED {
+            background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
+            border-color: var(--color-red);
+            color: white;
+        }
+
+        .word-card.BLUE {
+            background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
+            border-color: var(--color-blue);
+            color: white;
+        }
+
+        .word-card.INNOCENT {
+            background: var(--color-beige);
+            border-color: var(--color-beige);
+            color: var(--color-black);
+        }
+
+        .word-card.ASSASSIN {
+            background: var(--color-black);
+            border-color: var(--color-red);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); }
+        }
+
+        /* Spymaster view - show colors on unrevealed cards */
+        .word-card.spy-hint-red:not(.revealed) {
+            border-color: var(--color-red);
+            border-width: 4px;
+        }
+
+        .word-card.spy-hint-blue:not(.revealed) {
+            border-color: var(--color-blue);
+            border-width: 4px;
+        }
+
+        .word-card.spy-hint-beige:not(.revealed) {
+            border-color: var(--color-beige);
+            border-width: 4px;
+        }
+
+        .word-card.spy-hint-black:not(.revealed) {
+            border-color: var(--color-black);
+            border-width: 4px;
+            box-shadow: 0 0 15px rgba(211, 47, 47, 0.5);
+        }
+
+        /* Controls */
+        .controls-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+        }
+
+        .control-row {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .control-input {
+            flex: 1;
+        }
+
+        /* ============================================ */
+        /* 🎭 MODAL */
+        /* ============================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: var(--spacing-lg);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .modal-message {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.8;
+        }
+
+        /* ============================================ */
+        /* 📱 RESPONSIVE */
+        /* ============================================ */
+        @media (max-width: 1024px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .sidebar {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+
+            .game-grid {
+                gap: 6px;
+            }
+
+            .word-card {
+                font-size: 0.85rem;
+                padding: 4px;
+            }
+        }
+
+        /* ============================================ */
+        /* 🎯 UTILITIES */
+        /* ============================================ */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-lg {
+            margin-bottom: var(--spacing-lg);
+        }
     </style>
 </head>
 <body>
 
 <!-- ============================================ -->
-<!-- SPLASH SCREEN -->
+<!-- HOME SCREEN -->
 <!-- ============================================ -->
-<div id="splash-screen" class="screen active">
-    <div class="splash-logo">🎯</div>
-    <h1 class="splash-title">Code Names</h1>
-    <p class="splash-subtitle">النسخة العربية</p>
-</div>
-
-<!-- ============================================ -->
-<!-- ONBOARDING SCREEN -->
-<!-- ============================================ -->
-<div id="onboarding-screen" class="screen">
-    <div class="onboarding-container" id="onboarding-container">
-        <div class="onboarding-slide">
-            <div class="onboarding-icon">👥</div>
-            <h2>العب مع أصدقائك</h2>
-            <p>انضم إلى لعبة Code Names الشهيرة بنسخة عربية كاملة. العب مع أصدقائك في أي مكان!</p>
-        </div>
+<div id="home-screen" class="screen active">
+    <div class="home-container">
+        <div class="logo">🎯</div>
+        <h1 class="title">Codenames العربية</h1>
+        <p class="subtitle">لعبة أسماء الشفرة الكلاسيكية باللغة العربية</p>
         
-        <div class="onboarding-slide">
-            <div class="onboarding-icon">🎯</div>
-            <h2>فريقان، هدف واحد</h2>
-            <p>فريق أحمر وفريق أزرق. كل فريق يحتاج قائد ومخمنين. اعمل معاً لاكتشاف كلماتك قبل الفريق الآخر!</p>
-        </div>
-        
-        <div class="onboarding-slide">
-            <div class="onboarding-icon">💡</div>
-            <h2>احذر القاتل!</h2>
-            <p>تجنب البطاقة السوداء (القاتل) وإلا خسر فريقك فوراً. استخدم التلميحات بذكاء!</p>
-        </div>
-    </div>
-    
-    <div class="onboarding-dots" id="onboarding-dots">
-        <div class="onboarding-dot active"></div>
-        <div class="onboarding-dot"></div>
-        <div class="onboarding-dot"></div>
-    </div>
-    
-    <div class="onboarding-footer">
-        <button class="btn-skip" id="btn-skip">تخطي</button>
-        <button class="btn btn-primary" id="btn-next">التالي</button>
-    </div>
-</div>
-
-<!-- ============================================ -->
-<!-- AUTH SCREEN -->
-<!-- ============================================ -->
-<div id="auth-screen" class="screen">
-    <div class="auth-header">
-        <h1>🎯 Code Names</h1>
-        <p class="auth-subtitle">سجّل دخولك لبدء اللعب</p>
-    </div>
-    
-    <div class="card">
-        <div class="input-group">
-            <label>اسم المستخدم</label>
-            <div class="input-wrapper">
-                <input type="text" id="username-input" placeholder="اختر اسماً للعرض">
-                <span class="input-icon">📧</span>
+        <div class="card">
+            <div class="input-group">
+                <label>اسم اللاعب</label>
+                <input type="text" id="username-input" placeholder="أدخل اسمك">
             </div>
-        </div>
-        
-        <div class="input-group">
-            <label>كلمة المرور</label>
-            <div class="input-wrapper">
-                <input type="password" id="password-input" placeholder="••••••••">
-                <span class="input-icon">🔒</span>
-            </div>
-        </div>
-        
-        <div class="button-group">
-            <button class="btn btn-primary btn-full" id="auth-submit">
-                <span>تسجيل الدخول</span>
+            
+            <button class="btn btn-primary" id="btn-enter-game">
+                <span>دخول اللعبة</span>
             </button>
-            <button class="btn btn-ghost btn-full" id="auth-toggle">
-                <span>إنشاء حساب جديد</span>
-            </button>
+        </div>
+
+        <div class="card">
+            <h3 class="mb-lg">كيف تلعب:</h3>
+            <ol style="text-align: right; line-height: 2;">
+                <li>أدخل اسمك واضغط على "دخول اللعبة"</li>
+                <li>اختر إعدادات اللعبة وابدأ</li>
+                <li>شارك رابط الغرفة مع أصدقائك</li>
+                <li>استمتع باللعبة!</li>
+            </ol>
         </div>
     </div>
 </div>
@@ -996,157 +510,149 @@ input:focus {
 <!-- LOBBY SCREEN -->
 <!-- ============================================ -->
 <div id="lobby-screen" class="screen">
-    <div class="auth-header mb-xl">
-        <h1>مرحباً <span id="username-display">اللاعب</span>! 👋</h1>
-        <p class="auth-subtitle">اختر طريقة اللعب</p>
-    </div>
-    
-    <div class="lobby-actions">
-        <div class="action-card">
-            <div class="action-header">
-                <div class="action-icon">➕</div>
-                <h3>إنشاء غرفة جديدة</h3>
-            </div>
-            <p class="action-description">أنشئ غرفة جديدة وشارك الكود مع أصدقائك للانضمام</p>
-            <div class="input-group">
-                <input type="text" id="create-room-name" placeholder="اسم مخصص (اختياري)" maxlength="6">
-            </div>
-            <button class="btn btn-accent btn-full" id="btn-create-room">
-                <span class="btn-icon">🚀</span>
-                <span>إنشاء غرفة</span>
-            </button>
-        </div>
+    <div class="home-container">
+        <h2 class="title" style="font-size: 2rem;">مرحباً <span id="player-name-display"></span>! 👋</h2>
         
-        <div class="action-card">
-            <div class="action-header">
-                <div class="action-icon">🚪</div>
-                <h3>الانضمام لغرفة</h3>
-            </div>
-            <p class="action-description">أدخل كود الغرفة للانضمام إلى أصدقائك</p>
+        <div class="card">
+            <h3 class="mb-lg">إنشاء غرفة جديدة</h3>
             <div class="input-group">
-                <input type="text" id="join-room-code" placeholder="أدخل الكود (مثال: AB12CD)" maxlength="6">
+                <label>اسم مخصص (اختياري)</label>
+                <input type="text" id="create-room-name" placeholder="اترك فارغاً للرمز التلقائي" maxlength="6">
             </div>
-            <button class="btn btn-primary btn-full" id="btn-join-room">
-                <span class="btn-icon">→</span>
-                <span>انضمام</span>
+            <button class="btn btn-primary" id="btn-create-room">
+                <span>🚀 إنشاء غرفة</span>
             </button>
         </div>
+
+        <div class="card">
+            <h3 class="mb-lg">الانضمام لغرفة</h3>
+            <div class="input-group">
+                <label>كود الغرفة</label>
+                <input type="text" id="join-room-code" placeholder="أدخل الكود" maxlength="6">
+            </div>
+            <button class="btn btn-secondary" id="btn-join-room">
+                <span>→ انضمام</span>
+            </button>
+        </div>
+
+        <button class="btn btn-ghost" id="btn-back-home">
+            <span>← العودة</span>
+        </button>
     </div>
-    
-    <button class="btn btn-ghost btn-full mt-auto" id="btn-logout">
-        <span>تسجيل الخروج</span>
-    </button>
 </div>
 
 <!-- ============================================ -->
 <!-- WAITING ROOM -->
 <!-- ============================================ -->
 <div id="waiting-room" class="screen">
-    <div class="waiting-header">
-        <h2>غرفة الانتظار</h2>
-        <div class="room-code-display">
-            <span class="room-code-label">كود الغرفة:</span>
-            <span class="room-code-value" id="room-code">------</span>
+    <div class="home-container">
+        <h2 class="title" style="font-size: 2rem;">غرفة الانتظار</h2>
+        <div class="card text-center mb-lg">
+            <p style="color: var(--text-secondary); margin-bottom: var(--spacing-sm);">كود الغرفة:</p>
+            <h1 id="room-code-display" style="font-size: 3rem; letter-spacing: 8px; color: var(--color-blue);">------</h1>
         </div>
-    </div>
-    
-    <div class="card mb-lg">
-        <div class="team-selection">
-            <h3>⚔️ اختر فريقك ودورك</h3>
-            <div class="role-grid" id="role-selection">
-                <button class="role-btn role-btn-red" data-team="RED" data-role="SPYMASTER">
-                    <div class="role-icon-large">👑</div>
-                    <div class="role-name">قائد أحمر</div>
+
+        <div class="card mb-lg">
+            <h3 class="mb-lg">⚔️ اختر فريقك ودورك</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                <button class="role-btn" data-team="RED" data-role="SPYMASTER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-red); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
+                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">👑</div>
+                    <div>قائد أحمر</div>
                 </button>
                 
-                <button class="role-btn role-btn-red" data-team="RED" data-role="GUESSER">
-                    <div class="role-icon-large">🎯</div>
-                    <div class="role-name">مخمن أحمر</div>
+                <button class="role-btn" data-team="RED" data-role="GUESSER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-red); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
+                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">🎯</div>
+                    <div>مخمن أحمر</div>
                 </button>
                 
-                <button class="role-btn role-btn-blue" data-team="BLUE" data-role="SPYMASTER">
-                    <div class="role-icon-large">👑</div>
-                    <div class="role-name">قائد أزرق</div>
+                <button class="role-btn" data-team="BLUE" data-role="SPYMASTER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-blue); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
+                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">👑</div>
+                    <div>قائد أزرق</div>
                 </button>
                 
-                <button class="role-btn role-btn-blue" data-team="BLUE" data-role="GUESSER">
-                    <div class="role-icon-large">🎯</div>
-                    <div class="role-name">مخمن أزرق</div>
+                <button class="role-btn" data-team="BLUE" data-role="GUESSER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-blue); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
+                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">🎯</div>
+                    <div>مخمن أزرق</div>
                 </button>
             </div>
+
+            <h3 class="mb-lg">👥 اللاعبون (<span id="players-count">0</span>)</h3>
+            <ul id="players-list" style="list-style: none; display: flex; flex-direction: column; gap: var(--spacing-sm);"></ul>
         </div>
-        
-        <div class="team-selection">
-            <h3>👥 اللاعبون (<span id="players-count">0</span>)</h3>
-            <ul class="players-list" id="players-list">
-                <!-- Dynamic players -->
-            </ul>
-        </div>
+
+        <button class="btn btn-primary hidden" id="btn-start-game">
+            <span>🚀 ابدأ اللعبة</span>
+        </button>
+
+        <button class="btn btn-ghost" id="btn-leave-room">
+            <span>مغادرة الغرفة</span>
+        </button>
     </div>
-    
-    <button class="btn btn-success btn-full btn-large hidden" id="btn-start-game">
-        <span class="btn-icon">🚀</span>
-        <span>ابدأ اللعبة</span>
-    </button>
-    
-    <button class="btn btn-danger btn-full mt-auto" id="btn-leave-room">
-        <span>مغادرة الغرفة</span>
-    </button>
 </div>
 
 <!-- ============================================ -->
 <!-- GAME SCREEN -->
 <!-- ============================================ -->
 <div id="game-screen" class="screen">
-    <div class="game-header">
-        <div class="game-info">
-            <div class="team-score team-red">
-                <div class="score-label">🔴 الأحمر</div>
-                <div class="score-value" id="red-score">9</div>
+    <div class="game-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Scores -->
+            <div class="score-card">
+                <div class="score-team">
+                    <div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">🔴 الأحمر</div>
+                        <div class="score-value team-red" id="red-score">9</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">🔵 الأزرق</div>
+                        <div class="score-value team-blue" id="blue-score">8</div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="turn-indicator">
-                <div id="current-turn">دور الفريق الأحمر</div>
+
+            <!-- Clue -->
+            <div class="clue-card">
+                <div class="clue-header">💡 التلميح الحالي</div>
+                <div class="clue-text" id="current-clue">في انتظار التلميح...</div>
+                <div class="clue-count" id="clue-guesses">محاولات متبقية: <strong>0</strong></div>
             </div>
-            
-            <div class="team-score team-blue">
-                <div class="score-label">🔵 الأزرق</div>
-                <div class="score-value" id="blue-score">8</div>
+
+            <!-- Controls -->
+            <div class="controls-card">
+                <!-- Spymaster Controls -->
+                <div id="spymaster-controls" class="hidden">
+                    <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">👑 إعطاء تلميح</h4>
+                    <div class="control-row">
+                        <input type="text" class="control-input" id="clue-input" placeholder="التلميح">
+                        <input type="number" class="control-input" id="count-input" placeholder="العدد" min="1" max="9" style="max-width: 80px;">
+                    </div>
+                    <button class="btn btn-primary" id="btn-give-clue">
+                        <span>💡 إعطاء التلميح</span>
+                    </button>
+                </div>
+
+                <!-- Guesser Controls -->
+                <div id="guesser-controls" class="hidden">
+                    <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">🎯 دورك في التخمين</h4>
+                    <button class="btn btn-secondary" id="btn-end-turn">
+                        <span>⏭ إنهاء الدور</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Room Info -->
+            <div class="card" style="padding: var(--spacing-sm); font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+                <div>كود الغرفة: <strong id="game-room-code" style="color: var(--color-blue);">----</strong></div>
             </div>
         </div>
-        
-        <div class="clue-display" id="clue-display">
-            <div class="clue-label">التلميح الحالي</div>
-            <div class="clue-word" id="current-clue">في انتظار التلميح...</div>
-            <div class="clue-count" id="clue-guesses">محاولات متبقية: <strong>0</strong></div>
-        </div>
-    </div>
-    
-    <div class="game-board-container">
-        <div class="game-grid" id="game-board">
-            <!-- Dynamic cards -->
-        </div>
-    </div>
-    
-    <div class="game-controls">
-        <!-- Spymaster Controls -->
-        <div id="spymaster-controls" class="hidden">
-            <div class="control-input-group">
-                <input type="text" id="clue-input" class="control-input" placeholder="أدخل التلميح">
-                <input type="number" id="count-input" class="control-input" placeholder="العدد" min="1" max="9">
+
+        <!-- Board -->
+        <div class="board-container">
+            <div class="turn-indicator" id="turn-indicator">دور الفريق الأحمر</div>
+            <div class="game-grid" id="game-board">
+                <!-- Cards will be generated here -->
             </div>
-            <button class="btn btn-accent btn-full" id="btn-give-clue">
-                <span class="btn-icon">💡</span>
-                <span>إعطاء التلميح</span>
-            </button>
-        </div>
-        
-        <!-- Guesser Controls -->
-        <div id="guesser-controls" class="hidden">
-            <button class="btn btn-danger btn-full" id="btn-end-turn">
-                <span class="btn-icon">⏭</span>
-                <span>إنهاء الدور</span>
-            </button>
         </div>
     </div>
 </div>
@@ -1159,10 +665,7 @@ input:focus {
         <div class="modal-icon" id="modal-icon">ℹ️</div>
         <h3 class="modal-title" id="modal-title">عنوان</h3>
         <p class="modal-message" id="modal-message">رسالة</p>
-        <div class="modal-actions">
-            <button class="btn btn-primary btn-full" id="modal-confirm">حسناً</button>
-            <button class="btn btn-ghost btn-full hidden" id="modal-cancel">إلغاء</button>
-        </div>
+        <button class="btn btn-primary" id="modal-confirm">حسناً</button>
     </div>
 </div>
 
@@ -1171,549 +674,256 @@ input:focus {
 <!-- ============================================ -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-// ============================================
-// 🎯 CONFIGURATION
-// ============================================
+// Configuration
 const BACKEND_URL = 'https://codenames-arabic-server.onrender.com';
-const SPLASH_DURATION = 2000;
-
 let socket;
-let userState = {
-    token: localStorage.getItem('token') || null,
-    userId: localStorage.getItem('userId') || null,
-    username: localStorage.getItem('username') || null,
-    isAuthenticated: !!localStorage.getItem('token')
-};
-let gameState = {};
-let currentSlide = 0;
-
-// ============================================
-// 🔧 UTILITY FUNCTIONS
-// ============================================
-
-// Haptic Feedback
-const vibrate = (pattern = 10) => {
-    if ('vibrate' in navigator) {
-        navigator.vibrate(pattern);
-    }
+let gameState = {
+    username: '',
+    roomCode: '',
+    myTeam: null,
+    myRole: null
 };
 
-// Screen Management
+// ============================================
+// UTILITIES
+// ============================================
+const $ = (id) => document.getElementById(id);
 const switchScreen = (screenId) => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const screen = document.getElementById(screenId);
-    if (screen) {
-        setTimeout(() => screen.classList.add('active'), 50);
-    }
+    $(screenId).classList.add('active');
 };
 
-// Modal System
 const Modal = {
-    show({ icon = 'ℹ️', title, message, showCancel = false, onConfirm, onCancel }) {
-        vibrate(10);
-        document.getElementById('modal-icon').textContent = icon;
-        document.getElementById('modal-title').textContent = title;
-        document.getElementById('modal-message').textContent = message;
-        
-        const cancelBtn = document.getElementById('modal-cancel');
-        if (showCancel) {
-            cancelBtn.classList.remove('hidden');
-            cancelBtn.onclick = () => {
-                this.hide();
-                if (onCancel) onCancel();
-            };
-        } else {
-            cancelBtn.classList.add('hidden');
-        }
-        
-        document.getElementById('modal-confirm').onclick = () => {
-            this.hide();
-            if (onConfirm) onConfirm();
-        };
-        
-        document.getElementById('modal').classList.add('active');
+    show(icon, title, message) {
+        $('modal-icon').textContent = icon;
+        $('modal-title').textContent = title;
+        $('modal-message').textContent = message;
+        $('modal').classList.add('active');
     },
-    
     hide() {
-        document.getElementById('modal').classList.remove('active');
+        $('modal').classList.remove('active');
     },
-    
-    success(message, onConfirm) {
-        this.show({ icon: '✅', title: 'نجاح!', message, onConfirm });
+    success(message) {
+        this.show('✅', 'نجاح!', message);
     },
-    
-    error(message, onConfirm) {
-        this.show({ icon: '❌', title: 'خطأ!', message, onConfirm });
+    error(message) {
+        this.show('❌', 'خطأ!', message);
     },
-    
-    confirm(message, onConfirm, onCancel) {
-        this.show({ icon: '⚠️', title: 'تأكيد', message, showCancel: true, onConfirm, onCancel });
+    info(message) {
+        this.show('ℹ️', 'معلومة', message);
     }
 };
 
 // ============================================
-// 🚀 INITIALIZATION
+// SOCKET CONNECTION
 // ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    // Splash Screen
-    setTimeout(() => {
-        const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-        if (hasSeenOnboarding) {
-            if (userState.isAuthenticated) {
-                connectToServer();
-            } else {
-                switchScreen('auth-screen');
-            }
-        } else {
-            switchScreen('onboarding-screen');
-        }
-    }, SPLASH_DURATION);
-    
-    setupOnboarding();
-    setupAuth();
-    setupLobby();
-    setupWaitingRoom();
-    setupGame();
-});
-
-// ============================================
-// 📖 ONBOARDING
-// ============================================
-const setupOnboarding = () => {
-    const container = document.getElementById('onboarding-container');
-    const dots = document.getElementById('onboarding-dots');
-    const btnNext = document.getElementById('btn-next');
-    const btnSkip = document.getElementById('btn-skip');
-    
-    let touchStartX = 0;
-    let touchEndX = 0;
-    
-    container.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-    
-    container.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-    
-    const handleSwipe = () => {
-        if (touchStartX - touchEndX > 50) {
-            nextSlide();
-        } else if (touchEndX - touchStartX > 50) {
-            prevSlide();
-        }
-    };
-    
-    // إضافة: مزامنة currentSlide مع السكرول
-    container.addEventListener('scroll', () => {
-        const slideWidth = window.innerWidth;
-        const newSlide = Math.round(container.scrollLeft / slideWidth);
-        if (newSlide !== currentSlide) {
-            currentSlide = newSlide;
-            updateDots();
-        }
+const connectSocket = () => {
+    socket = io(BACKEND_URL, {
+        transports: ['websocket', 'polling']
     });
 
-    const updateDots = () => {
-        dots.querySelectorAll('.onboarding-dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentSlide);
-        });
-    };
-    
-    const nextSlide = () => {
-        if (currentSlide < 2) {
-            currentSlide++;
-            container.scrollTo({
-                left: window.innerWidth * currentSlide,
-                behavior: 'smooth'
-            });
-            updateDots();
-            vibrate(10);
-        } else {
-            finishOnboarding();
-        }
-    };
-    
-    const prevSlide = () => {
-        if (currentSlide > 0) {
-            currentSlide--;
-            container.scrollTo({
-                left: window.innerWidth * currentSlide,
-                behavior: 'smooth'
-            });
-            updateDots();
-            vibrate(10);
-        }
-    };
-    
-    const finishOnboarding = () => {
-        localStorage.setItem('hasSeenOnboarding', 'true');
-        vibrate([10, 50, 10]);
-        if (userState.isAuthenticated) {
-            connectToServer();
-        } else {
-            switchScreen('auth-screen');
-        }
-    };
-    
-    btnNext.addEventListener('click', nextSlide);
-    btnSkip.addEventListener('click', finishOnboarding);
-};
-
-// ============================================
-// 🔐 AUTHENTICATION
-// ============================================
-const setupAuth = () => {
-    const submitBtn = document.getElementById('auth-submit');
-    const toggleBtn = document.getElementById('auth-toggle');
-    const usernameInput = document.getElementById('username-input');
-    let isLogin = true;
-    
-    toggleBtn.addEventListener('click', () => {
-        vibrate(10);
-        isLogin = !isLogin;
-        submitBtn.textContent = isLogin ? 'تسجيل الدخول' : 'إنشاء حساب';
-        toggleBtn.textContent = isLogin ? 'إنشاء حساب جديد' : 'لدي حساب بالفعل';
-        usernameInput.style.display = isLogin ? 'none' : 'block';
+    socket.on('connect', () => {
+        console.log('Connected:', socket.id);
     });
-    
-    submitBtn.addEventListener('click', async () => {
-        vibrate(10);
-        const email = document.getElementById('email-input').value.trim();
-        const password = document.getElementById('password-input').value;
-        const username = usernameInput.value.trim();
-        
-        if (!email || !password || (!isLogin && !username)) {
-            Modal.error('يرجى ملء جميع الحقول المطلوبة');
-            return;
-        }
-        
-        try {
-            const endpoint = isLogin ? 'login' : 'register';
-            const response = await fetch(`${BACKEND_URL}/api/users/${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, username })
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                userState.token = data.token;
-                userState.userId = data._id;
-                userState.username = data.username;
-                userState.isAuthenticated = true;
-                
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('userId', data._id);
-                localStorage.setItem('username', data.username);
-                
-                vibrate([10, 50, 10]);
-                Modal.success(`مرحباً ${data.username}!`, () => connectToServer());
-            } else {
-                Modal.error(data.message || 'حدث خطأ غير متوقع');
-            }
-        } catch (error) {
-            Modal.error('فشل الاتصال بالخادم');
-        }
-    });
-};
 
-// ============================================
-// 🌐 SERVER CONNECTION
-// ============================================
-const connectToServer = async () => {
-    switchScreen('splash-screen');
-    
-    try {
-        await fetch(`${BACKEND_URL}/`);
-        
-        socket = io(BACKEND_URL, {
-            auth: { token: userState.token },
-            transports: ['websocket', 'polling']
-        });
-        
-        setupSocketListeners();
-        
-        socket.on('connect', () => {
-            vibrate([10, 50, 10]);
-            switchScreen('lobby-screen');
-            document.getElementById('username-display').textContent = userState.username;
-        });
-        
-        socket.on('connect_error', () => {
-            Modal.error('خطأ في الاتصال بالخادم');
-        });
-    } catch (error) {
-        Modal.error('فشل الاتصال بالخادم');
-    }
-};
-
-// ============================================
-// 🎮 SOCKET LISTENERS
-// ============================================
-const setupSocketListeners = () => {
     socket.on('roomCreated', (data) => {
-        vibrate([10, 50, 10]);
-        gameState = data;
+        gameState.roomCode = data.code;
+        $('room-code-display').textContent = data.code;
         switchScreen('waiting-room');
-        document.getElementById('room-code').textContent = data.code;
         updatePlayersList(data.players);
     });
-    
+
     socket.on('roomUpdate', (players) => {
-        gameState.players = players;
         updatePlayersList(players);
-        updateRoleButtons(players);
     });
-    
+
     socket.on('gameStarted', (data) => {
-        vibrate([10, 50, 10, 50, 10]);
-        gameState = data;
+        gameState.board = data.board;
+        gameState.currentTurn = data.currentTurn;
+        $('game-room-code').textContent = gameState.roomCode;
         switchScreen('game-screen');
-        renderGameBoard();
-        updateGameUI();
+        renderBoard();
+        updateGameUI(data);
         Modal.success('بدأت اللعبة! حظاً موفقاً! 🎮');
     });
-    
-    socket.on('gameUpdate', (data) => {
-        Object.assign(gameState, data);
-        updateGameUI();
+
+    socket.on('clueGiven', (data) => {
+        $('current-clue').textContent = data.clue;
+        $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${data.count + 1}</strong>`;
     });
-    
-    socket.on('cardRevealed', ({ cardIndex, card }) => {
-        vibrate(30);
-        const cardEl = document.querySelector(`[data-index="${cardIndex}"]`);
-        if (cardEl) {
-            cardEl.classList.add('revealed', card.type);
+
+    socket.on('cardRevealed', (data) => {
+        const card = document.querySelector(`[data-index="${data.cardIndex}"]`);
+        if (card) {
+            card.classList.add('revealed', data.card.type);
         }
         updateScores();
     });
-    
-    socket.on('clueGiven', ({ clue, count }) => {
-        vibrate(10);
-        document.getElementById('current-clue').textContent = clue;
-        document.getElementById('clue-guesses').innerHTML = `محاولات متبقية: <strong>${count + 1}</strong>`;
+
+    socket.on('gameUpdate', (data) => {
+        updateGameUI(data);
     });
-    
+
     socket.on('roomError', (msg) => Modal.error(msg));
     socket.on('gameError', (msg) => Modal.error(msg));
-    socket.on('roleError', (msg) => Modal.error(msg));
 };
 
 // ============================================
-// 🏠 LOBBY
+// HOME SCREEN
 // ============================================
-const setupLobby = () => {
-    document.getElementById('btn-create-room').addEventListener('click', () => {
-        vibrate(10);
-        const customName = document.getElementById('create-room-name').value.toUpperCase().trim();
-        socket.emit('createRoom', {
-            customName,
-            username: userState.username,
-            userId: userState.userId
-        });
-    });
-    
-    document.getElementById('btn-join-room').addEventListener('click', () => {
-        vibrate(10);
-        const code = document.getElementById('join-room-code').value.toUpperCase().trim();
-        if (!code) {
-            Modal.error('يرجى إدخال كود الغرفة');
-            return;
-        }
-        socket.emit('joinRoom', {
-            roomCode: code,
-            username: userState.username,
-            userId: userState.userId
-        });
-        
-        socket.once('roomUpdate', () => {
-            switchScreen('waiting-room');
-            document.getElementById('room-code').textContent = code;
-        });
-    });
-    
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        Modal.confirm('هل أنت متأكد من تسجيل الخروج؟', () => {
-            localStorage.clear();
-            location.reload();
-        });
-    });
-};
+$('btn-enter-game').addEventListener('click', () => {
+    const username = $('username-input').value.trim();
+    if (!username) {
+        Modal.error('يرجى إدخال اسمك');
+        return;
+    }
+    gameState.username = username;
+    $('player-name-display').textContent = username;
+    switchScreen('lobby-screen');
+    connectSocket();
+});
 
 // ============================================
-// ⏳ WAITING ROOM
+// LOBBY SCREEN
 // ============================================
-const setupWaitingRoom = () => {
-    document.getElementById('role-selection').addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-team]');
-        if (!btn) return;
-        
-        vibrate(10);
+$('btn-create-room').addEventListener('click', () => {
+    const customName = $('create-room-name').value.toUpperCase().trim();
+    socket.emit('createRoom', {
+        customName,
+        username: gameState.username
+    });
+});
+
+$('btn-join-room').addEventListener('click', () => {
+    const code = $('join-room-code').value.toUpperCase().trim();
+    if (!code) {
+        Modal.error('يرجى إدخال كود الغرفة');
+        return;
+    }
+    socket.emit('joinRoom', {
+        roomCode: code,
+        username: gameState.username
+    });
+    
+    socket.once('roomUpdate', () => {
+        gameState.roomCode = code;
+        $('room-code-display').textContent = code;
+        switchScreen('waiting-room');
+    });
+});
+
+$('btn-back-home').addEventListener('click', () => {
+    if (socket) socket.disconnect();
+    switchScreen('home-screen');
+});
+
+// ============================================
+// WAITING ROOM
+// ============================================
+document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
         const team = btn.dataset.team;
         const role = btn.dataset.role;
-        
+        gameState.myTeam = team;
+        gameState.myRole = role;
         socket.emit('setRole', { team, role });
     });
-    
-    document.getElementById('btn-start-game').addEventListener('click', () => {
-        vibrate([10, 50, 10]);
-        socket.emit('startGame');
-    });
-    
-    document.getElementById('btn-leave-room').addEventListener('click', () => {
-        Modal.confirm('هل تريد مغادرة الغرفة؟', () => {
-            switchScreen('lobby-screen');
-        });
-    });
-};
+});
+
+$('btn-start-game').addEventListener('click', () => {
+    socket.emit('startGame');
+});
+
+$('btn-leave-room').addEventListener('click', () => {
+    switchScreen('lobby-screen');
+});
 
 const updatePlayersList = (players) => {
-    const list = document.getElementById('players-list');
-    const count = document.getElementById('players-count');
-    count.textContent = players.length;
+    const list = $('players-list');
+    $('players-count').textContent = players.length;
     
     list.innerHTML = players.map(p => {
         const teamIcon = p.team === 'RED' ? '🔴' : p.team === 'BLUE' ? '🔵' : '⚪';
         const roleIcon = p.role === 'SPYMASTER' ? ' 👑' : p.role === 'GUESSER' ? ' 🎯' : '';
-        return `<li>${teamIcon} ${p.username}${roleIcon}</li>`;
+        return `<li style="padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--radius-sm);">${teamIcon} ${p.username}${roleIcon}</li>`;
     }).join('');
     
-    // Show start button for host
-    const isHost = players[0]?.userId === userState.userId;
+    // Show start button if conditions met
     const hasEnoughPlayers = players.filter(p => p.team && p.role).length >= 4;
-    const startBtn = document.getElementById('btn-start-game');
-    
-    if (isHost && hasEnoughPlayers) {
-        startBtn.classList.remove('hidden');
+    if (hasEnoughPlayers) {
+        $('btn-start-game').classList.remove('hidden');
     } else {
-        startBtn.classList.add('hidden');
-    }
-};
-
-const updateRoleButtons = (players) => {
-    document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
-    
-    const currentPlayer = players.find(p => p.id === socket.id);
-    if (currentPlayer?.team && currentPlayer?.role) {
-        const selector = `[data-team="${currentPlayer.team}"][data-role="${currentPlayer.role}"]`;
-        document.querySelector(selector)?.classList.add('selected');
+        $('btn-start-game').classList.add('hidden');
     }
 };
 
 // ============================================
-// 🎮 GAME
+// GAME SCREEN
 // ============================================
-const setupGame = () => {
-    document.getElementById('btn-give-clue').addEventListener('click', () => {
-        vibrate(10);
-        const clue = document.getElementById('clue-input').value.trim();
-        const count = parseInt(document.getElementById('count-input').value);
+const renderBoard = () => {
+    const board = $('game-board');
+    board.innerHTML = '';
+    
+    gameState.board.forEach((card, index) => {
+        const div = document.createElement('div');
+        div.className = 'word-card';
+        div.textContent = card.word;
+        div.dataset.index = index;
         
-        if (!clue || !count || count < 1 || count > 9) {
-            Modal.error('يرجى إدخال تلميح وعدد صحيح');
-            return;
-        }
-        
-        socket.emit('giveClue', { clue, count });
-        document.getElementById('clue-input').value = '';
-        document.getElementById('count-input').value = '';
-    });
-    
-    document.getElementById('btn-end-turn').addEventListener('click', () => {
-        Modal.confirm('هل تريد إنهاء الدور؟', () => {
-            vibrate(10);
-            socket.emit('endTurn');
-        });
-    });
-    
-    // Swipe to end turn
-    let touchY = 0;
-    const boardContainer = document.querySelector('.game-board-container');
-    
-    boardContainer.addEventListener('touchstart', (e) => {
-        touchY = e.touches[0].clientY;
-    });
-    
-    boardContainer.addEventListener('touchend', (e) => {
-        const deltaY = e.changedTouches[0].clientY - touchY;
-        if (deltaY > 100) {
-            const player = gameState.players?.find(p => p.socketId === socket.id);
-            if (player?.role === 'GUESSER') {
-                socket.emit('endTurn');
-                vibrate(10);
-            }
-        }
-    });
-};
-
-const renderGameBoard = () => {
-    const board = document.getElementById('game-board');
-    const player = gameState.players.find(p => p.socketId === socket.id || p.id === socket.id);
-    
-    board.innerHTML = gameState.board.map((card, i) => {
-        const classes = ['card-word'];
-        if (card.revealed) classes.push('revealed', card.type);
-        
-        let style = '';
-        if (!card.revealed && player?.role === 'SPYMASTER') {
-            const colors = {
-                RED: 'var(--color-red)',
-                BLUE: 'var(--color-blue)',
-                INNOCENT: 'var(--color-innocent)',
-                ASSASSIN: 'var(--color-assassin)'
+        if (card.revealed) {
+            div.classList.add('revealed', card.type);
+        } else if (gameState.myRole === 'SPYMASTER') {
+            // Show color hints for spymaster
+            const hintClass = {
+                'RED': 'spy-hint-red',
+                'BLUE': 'spy-hint-blue',
+                'INNOCENT': 'spy-hint-beige',
+                'ASSASSIN': 'spy-hint-black'
             };
-            style = `border-color: ${colors[card.type]}; border-width: 3px;`;
+            div.classList.add(hintClass[card.type]);
         }
         
-        return `<div class="${classes.join(' ')}" data-index="${i}" style="${style}">${card.word}</div>`;
-    }).join('');
-    
-    // Add click handlers
-    if (player?.role === 'GUESSER') {
-        board.querySelectorAll('.card-word:not(.revealed)').forEach(card => {
-            card.addEventListener('click', () => {
-                vibrate(20);
-                const index = parseInt(card.dataset.index);
+        if (gameState.myRole === 'GUESSER' && !card.revealed) {
+            div.addEventListener('click', () => {
                 socket.emit('makeGuess', { cardIndex: index });
             });
-        });
-    }
+        }
+        
+        board.appendChild(div);
+    });
     
-    updateControls(player);
+    updateControls();
 };
 
-const updateControls = (player) => {
-    const spymaster = document.getElementById('spymaster-controls');
-    const guesser = document.getElementById('guesser-controls');
+const updateControls = () => {
+    const spymaster = $('spymaster-controls');
+    const guesser = $('guesser-controls');
     
-    if (player?.role === 'SPYMASTER') {
+    if (gameState.myRole === 'SPYMASTER') {
         spymaster.classList.remove('hidden');
         guesser.classList.add('hidden');
-    } else if (player?.role === 'GUESSER') {
+    } else if (gameState.myRole === 'GUESSER') {
         spymaster.classList.add('hidden');
         guesser.classList.remove('hidden');
     }
 };
 
-const updateGameUI = () => {
-    if (gameState.currentTurn) {
-        const turnText = gameState.currentTurn === 'RED' ? 'دور الفريق الأحمر' : 'دور الفريق الأزرق';
-        document.getElementById('current-turn').textContent = turnText;
+const updateGameUI = (data) => {
+    if (data.currentTurn) {
+        const turnText = data.currentTurn === 'RED' ? 'دور الفريق الأحمر 🔴' : 'دور الفريق الأزرق 🔵';
+        $('turn-indicator').textContent = turnText;
+        $('turn-indicator').style.background = data.currentTurn === 'RED' ? 
+            'linear-gradient(135deg, rgba(211, 47, 47, 0.2), transparent)' :
+            'linear-gradient(135deg, rgba(25, 118, 210, 0.2), transparent)';
     }
     
     updateScores();
     
-    if (gameState.winner) {
-        vibrate([50, 100, 50, 100, 50]);
-        const winnerText = gameState.winner === 'RED' ? 'الفريق الأحمر' : 'الفريق الأزرق';
-        Modal.show({
-            icon: '🏆',
-            title: 'انتهت اللعبة!',
-            message: `فاز ${winnerText}! تهانينا! 🎉`
-        });
+    if (data.winner) {
+        const winnerText = data.winner === 'RED' ? 'الفريق الأحمر' : 'الفريق الأزرق';
+        setTimeout(() => {
+            Modal.show('🏆', 'انتهت اللعبة!', `فاز ${winnerText}! تهانينا! 🎉`);
+        }, 500);
     }
 };
 
@@ -1728,10 +938,34 @@ const updateScores = () => {
         }
     });
     
-    document.getElementById('red-score').textContent = red;
-    document.getElementById('blue-score').textContent = blue;
+    $('red-score').textContent = red;
+    $('blue-score').textContent = blue;
 };
-</script>
-</body>
-</html>
 
+// Spymaster give clue
+$('btn-give-clue').addEventListener('click', () => {
+    const clue = $('clue-input').value.trim();
+    const count = parseInt($('count-input').value);
+    
+    if (!clue || !count || count < 1 || count > 9) {
+        Modal.error('يرجى إدخال تلميح وعدد صحيح');
+        return;
+    }
+    
+    socket.emit('giveClue', { clue, count });
+    $('clue-input').value = '';
+    $('count-input').value = '';
+});
+
+// Guesser end turn
+$('btn-end-turn').addEventListener('click', () => {
+    socket.emit('endTurn');
+});
+
+// Modal close
+$('modal-confirm').addEventListener('click', () => {
+    Modal.hide();
+});
+
+// Wake up server on load
+fetch(`${BACKEND_URL}/`).catch(() => {});
