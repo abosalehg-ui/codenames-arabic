@@ -1,6 +1,3 @@
-// ============================================
-// 🎯 CONFIGURATION
-// ============================================
 const BACKEND_URL = 'https://codenames-arabic-server.onrender.com';
 
 let socket;
