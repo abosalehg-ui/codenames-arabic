@@ -659,16 +659,16 @@
 <div id="game-screen" class="screen">
     <div class="game-layout">
         <!-- Sidebar -->
-         <!-- Player Info Badge -->
-<div class="player-info-badge" id="player-info-badge">
-    <div class="badge-icon">👤</div>
-    <div class="badge-text">
-        <div class="badge-team">في انتظار...</div>
-        <div class="badge-role">اختر دورك</div>
-    </div>
-</div>
-
         <div class="sidebar">
+            <!-- Player Info Badge -->
+            <div class="player-info-badge" id="player-info-badge">
+                <div class="badge-icon">👤</div>
+                <div class="badge-text">
+                    <div class="badge-team">في انتظار...</div>
+                    <div class="badge-role">اختر دورك</div>
+                </div>
+            </div>
+
             <!-- Scores -->
             <div class="score-card">
                 <div class="score-team">
@@ -749,13 +749,6 @@
 // Configuration
 const BACKEND_URL = 'https://codenames-arabic-server.onrender.com';
 let socket;
-let gameState = {
-    username: '',
-    roomCode: '',
-    myTeam: null,
-    myRole: null
-};
-
 let gameState = {
     username: '',
     roomCode: '',
