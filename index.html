@@ -566,6 +566,10 @@
                 <li>استمتع باللعبة!</li>
             </ol>
         </div>
+        <!-- زر اختبار الصوت -->
+        <button class="btn btn-ghost" onclick="testSound()">
+            🔊 اختبار الصوت
+        </button>
     </div>
 </div>
 
@@ -766,6 +770,38 @@ const playSound = (name) => {
         } catch (e) {
             console.warn('Sound error:', e);
         }
+    }
+};
+
+// Sound function
+const playSound = (name) => {
+    if (typeof Audio !== 'undefined') {
+        try {
+            const audio = new Audio(`./assets/sounds/${name}.mp3`);
+            audio.volume = 0.5;
+            audio.play().catch(e => console.warn('Sound play failed:', e));
+        } catch (e) {
+            console.warn('Sound error:', e);
+        }
+    }
+};
+
+// Test sound function
+const testSound = () => {
+    try {
+        const audio = new Audio('./assets/sounds/connected.mp3');
+        audio.volume = 0.5;
+        audio.play()
+            .then(() => {
+                alert('✅ الصوت يعمل بشكل جيد!');
+            })
+            .catch(error => {
+                alert('❌ فشل تشغيل الصوت!\n\nالأسباب المحتملة:\n1. الملفات غير موجودة في المسار الصحيح\n2. المتصفح يحجب الصوت التلقائي\n3. أسماء الملفات غير صحيحة\n\nتفاصيل الخطأ: ' + error.message);
+                console.error('Sound test error:', error);
+            });
+    } catch (e) {
+        alert('❌ خطأ في تشغيل الصوت: ' + e.message);
+        console.error('Sound test exception:', e);
     }
 };
 
