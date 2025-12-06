@@ -204,6 +204,69 @@
             overflow-y: auto;
         }
 
+        /* Player Info Badge */
+.player-info-badge {
+    background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    border: 2px solid var(--bg-secondary);
+    box-shadow: var(--shadow);
+}
+
+.badge-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-primary);
+}
+
+.badge-text {
+    flex: 1;
+}
+
+.badge-team {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.badge-role {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Team colors for badge */
+.player-info-badge.team-red {
+    border-color: var(--color-red);
+}
+
+.player-info-badge.team-red .badge-icon {
+    background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
+}
+
+.player-info-badge.team-red .badge-team {
+    color: var(--color-red);
+}
+
+.player-info-badge.team-blue {
+    border-color: var(--color-blue);
+}
+
+.player-info-badge.team-blue .badge-icon {
+    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
+}
+
+.player-info-badge.team-blue .badge-team {
+    color: var(--color-blue);
+}
+
         .score-card {
             background: var(--bg-card);
             border-radius: var(--radius-md);
@@ -596,6 +659,15 @@
 <div id="game-screen" class="screen">
     <div class="game-layout">
         <!-- Sidebar -->
+         <!-- Player Info Badge -->
+<div class="player-info-badge" id="player-info-badge">
+    <div class="badge-icon">👤</div>
+    <div class="badge-text">
+        <div class="badge-team">في انتظار...</div>
+        <div class="badge-role">اختر دورك</div>
+    </div>
+</div>
+
         <div class="sidebar">
             <!-- Scores -->
             <div class="score-card">
@@ -684,6 +756,26 @@ let gameState = {
     myRole: null
 };
 
+let gameState = {
+    username: '',
+    roomCode: '',
+    myTeam: null,
+    myRole: null
+};
+
+// Sound function
+const playSound = (name) => {
+    if (typeof Audio !== 'undefined') {
+        try {
+            const audio = new Audio(`./assets/sounds/${name}.mp3`);
+            audio.volume = 0.5;
+            audio.play().catch(e => console.warn('Sound play failed:', e));
+        } catch (e) {
+            console.warn('Sound error:', e);
+        }
+    }
+};
+
 // ============================================
 // UTILITIES
 // ============================================
@@ -724,6 +816,7 @@ const connectSocket = () => {
 
     socket.on('connect', () => {
         console.log('Connected:', socket.id);
+        playSound('connected'); // 🔊
     });
 
     socket.on('roomCreated', (data) => {
@@ -738,6 +831,7 @@ const connectSocket = () => {
     });
 
     socket.on('gameStarted', (data) => {
+        playSound('game_start'); // 🔊
         gameState.board = data.board;
         gameState.currentTurn = data.currentTurn;
         $('game-room-code').textContent = gameState.roomCode;
@@ -753,12 +847,27 @@ const connectSocket = () => {
     });
 
     socket.on('cardRevealed', (data) => {
-        const card = document.querySelector(`[data-index="${data.cardIndex}"]`);
-        if (card) {
-            card.classList.add('revealed', data.card.type);
-        }
-        updateScores();
-    });
+    const card = document.querySelector(`[data-index="${data.cardIndex}"]`);
+    if (card) {
+        card.classList.add('revealed', data.card.type);
+    }
+    
+    // Play sound based on card type 🔊
+    switch (data.card.type) {
+        case 'RED':
+        case 'BLUE':
+            playSound('correct');
+            break;
+        case 'INNOCENT':
+            playSound('wrong');
+            break;
+        case 'ASSASSIN':
+            playSound('assassin_hit');
+            break;
+    }
+    
+    updateScores();
+});
 
     socket.on('gameUpdate', (data) => {
         updateGameUI(data);
@@ -861,6 +970,7 @@ const updatePlayersList = (players) => {
 // GAME SCREEN
 // ============================================
 const renderBoard = () => {
+    updatePlayerBadge();
     const board = $('game-board');
     board.innerHTML = '';
     
@@ -920,6 +1030,7 @@ const updateGameUI = (data) => {
     updateScores();
     
     if (data.winner) {
+        playSound('win_game'); // 🔊
         const winnerText = data.winner === 'RED' ? 'الفريق الأحمر' : 'الفريق الأزرق';
         setTimeout(() => {
             Modal.show('🏆', 'انتهت اللعبة!', `فاز ${winnerText}! تهانينا! 🎉`);
@@ -989,6 +1100,30 @@ $('join-room-code').addEventListener('keypress', (e) => {
 $('clue-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') $('btn-give-clue').click();
 });
+// Update player info badge
+const updatePlayerBadge = () => {
+    const badge = $('player-info-badge');
+    if (!badge) return;
+    
+    const teamText = gameState.myTeam === 'RED' ? '🔴 الفريق الأحمر' : 
+                     gameState.myTeam === 'BLUE' ? '🔵 الفريق الأزرق' : 'لا فريق';
+    
+    const roleText = gameState.myRole === 'SPYMASTER' ? '👑 القائد' : 
+                     gameState.myRole === 'GUESSER' ? '🎯 المخمن' : '';
+    
+    badge.querySelector('.badge-team').textContent = teamText;
+    badge.querySelector('.badge-role').textContent = roleText;
+    
+    // Add team class
+    badge.classList.remove('team-red', 'team-blue');
+    if (gameState.myTeam === 'RED') {
+        badge.classList.add('team-red');
+        badge.querySelector('.badge-icon').textContent = '🔴';
+    } else if (gameState.myTeam === 'BLUE') {
+        badge.classList.add('team-blue');
+        badge.querySelector('.badge-icon').textContent = '🔵';
+    }
+};
 </script>
 
 </body>
