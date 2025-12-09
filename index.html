@@ -493,16 +493,98 @@
         /* 📱 RESPONSIVE */
         /* ============================================ */
         @media (max-width: 1024px) {
-            .game-layout {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
-            }
+    .game-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: auto;
+    }
 
-            .sidebar {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-        }
+    .sidebar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-sm);
+        max-height: none;
+        overflow: visible;
+    }
+    
+    /* جعل Controls تأخذ عرض كامل */
+    .controls-card {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .game-grid {
+        gap: 6px;
+    }
+
+    .word-card {
+        font-size: 0.85rem;
+        padding: 4px;
+    }
+    
+    /* تصغير العناصر للجوال */
+    .sidebar {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .player-info-badge {
+        padding: var(--spacing-sm);
+    }
+    
+    .badge-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+    
+    .badge-team {
+        font-size: 0.95rem;
+    }
+    
+    .badge-role {
+        font-size: 0.75rem;
+    }
+    
+    .score-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .score-value {
+        font-size: 1.8rem;
+    }
+    
+    .clue-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .clue-text {
+        font-size: 1.3rem;
+        padding: var(--spacing-sm);
+    }
+    
+    .controls-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .control-row {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    
+    .control-input {
+        width: 100%;
+    }
+    
+    #count-input {
+        max-width: 100% !important;
+    }
+}
 
         @media (max-width: 768px) {
             .title {
@@ -862,9 +944,12 @@ const connectSocket = () => {
     });
 
     socket.on('clueGiven', (data) => {
-        $('current-clue').textContent = data.clue;
-        $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${data.count + 1}</strong>`;
-    });
+    gameState.clue = data.clue;
+    gameState.guessesLeft = data.count + 1;
+    
+    $('current-clue').textContent = data.clue;
+    $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${data.count + 1}</strong>`;
+});
 
     socket.on('cardRevealed', (data) => {
     const card = document.querySelector(`[data-index="${data.cardIndex}"]`);
@@ -885,13 +970,28 @@ const connectSocket = () => {
             playSound('assassin_hit');
             break;
     }
-    
     updateScores();
+    
+    // تحديث المحاولات المتبقية
+    if (gameState.guessesLeft > 0) {
+        gameState.guessesLeft--;
+        $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${gameState.guessesLeft}</strong>`;
+    }
 });
 
     socket.on('gameUpdate', (data) => {
-        updateGameUI(data);
-    });
+    if (data.guessesLeft !== undefined) {
+        gameState.guessesLeft = data.guessesLeft;
+        $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${data.guessesLeft}</strong>`;
+    }
+    
+    if (data.clue !== undefined) {
+        gameState.clue = data.clue;
+        $('current-clue').textContent = data.clue || 'في انتظار التلميح...';
+    }
+    
+    updateGameUI(data);
+});
 
     socket.on('roomError', (msg) => Modal.error(msg));
     socket.on('gameError', (msg) => Modal.error(msg));
@@ -1014,10 +1114,11 @@ const renderBoard = () => {
         }
         
         if (gameState.myRole === 'GUESSER' && !card.revealed) {
-            div.addEventListener('click', () => {
-                socket.emit('makeGuess', { cardIndex: index });
-            });
-        }
+    div.addEventListener('click', () => {
+        playSound('click'); // 🔊 صوت الضغط
+        socket.emit('makeGuess', { cardIndex: index });
+    });
+}
         
         board.appendChild(div);
     });
@@ -1090,6 +1191,7 @@ $('btn-give-clue').addEventListener('click', () => {
 
 // Guesser end turn
 $('btn-end-turn').addEventListener('click', () => {
+    playSound('door'); // 🔊 صوت الباب
     socket.emit('endTurn');
 });
 
