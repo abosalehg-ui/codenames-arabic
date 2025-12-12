@@ -6,627 +6,30 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1a1d29">
     <title>Codenames العربية - لعبة أسماء الشفرة</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        /* ============================================ */
-        /* 🎨 VARIABLES & RESET */
-        /* ============================================ */
-        :root {
-            --color-red: #d32f2f;
-            --color-red-dark: #b71c1c;
-            --color-blue: #1976d2;
-            --color-blue-dark: #0d47a1;
-            --color-beige: #ddc9a3;
-            --color-black: #212121;
-            
-            --bg-primary: #1a1d29;
-            --bg-secondary: #252936;
-            --bg-card: #2d3142;
-            
-            --text-primary: #ffffff;
-            --text-secondary: #b0b3c1;
-            --text-muted: #6c6f85;
-            
-            --spacing-xs: 8px;
-            --spacing-sm: 12px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
-            --spacing-xl: 32px;
-            
-            --radius-sm: 6px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* ============================================ */
-        /* 📱 SCREENS */
-        /* ============================================ */
-        .screen {
-            display: none;
-            min-height: 100vh;
-            padding: var(--spacing-lg);
-        }
-
-        .screen.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ============================================ */
-        /* 🏠 HOME SCREEN */
-        /* ============================================ */
-        .home-container {
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
-        }
-
-        .logo {
-            font-size: 4rem;
-            margin-bottom: var(--spacing-lg);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .title {
-            font-size: 3rem;
-            font-weight: 900;
-            margin-bottom: var(--spacing-md);
-            background: linear-gradient(135deg, var(--color-blue), var(--color-red));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .input-group {
-            margin-bottom: var(--spacing-md);
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-xs);
-            text-align: right;
-        }
-
-        input {
-            width: 100%;
-            padding: var(--spacing-md);
-            background: var(--bg-secondary);
-            border: 2px solid transparent;
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: 'Cairo', sans-serif;
-            transition: all 0.3s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--color-blue);
-            background: var(--bg-primary);
-        }
-
-        .btn {
-            width: 100%;
-            padding: var(--spacing-md) var(--spacing-lg);
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1.1rem;
-            font-weight: 700;
-            font-family: 'Cairo', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
-            color: white;
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 2px solid var(--bg-card);
-        }
-
-        /* ============================================ */
-        /* 🎮 GAME SCREEN */
-        /* ============================================ */
-        #game-screen {
-            padding: 0;
-            width: 100%;
-            max-width: 1400px;
-        }
-
-        .game-layout {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: var(--spacing-lg);
-            height: 100vh;
-            padding: var(--spacing-lg);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-            overflow-y: auto;
-        }
-
-        /* Player Info Badge */
-.player-info-badge {
-    background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    border: 2px solid var(--bg-secondary);
-    box-shadow: var(--shadow);
-}
-
-.badge-icon {
-    font-size: 2rem;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--bg-primary);
-}
-
-.badge-text {
-    flex: 1;
-}
-
-.badge-team {
-    font-size: 1.1rem;
-    font-weight: 800;
-    margin-bottom: 4px;
-}
-
-.badge-role {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* Team colors for badge */
-.player-info-badge.team-red {
-    border-color: var(--color-red);
-}
-
-.player-info-badge.team-red .badge-icon {
-    background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
-}
-
-.player-info-badge.team-red .badge-team {
-    color: var(--color-red);
-}
-
-.player-info-badge.team-blue {
-    border-color: var(--color-blue);
-}
-
-.player-info-badge.team-blue .badge-icon {
-    background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
-}
-
-.player-info-badge.team-blue .badge-team {
-    color: var(--color-blue);
-}
-
-        .score-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-md);
-            text-align: center;
-        }
-
-        .score-team {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .team-red {
-            color: var(--color-red);
-        }
-
-        .team-blue {
-            color: var(--color-blue);
-        }
-
-        .score-value {
-            font-size: 2.5rem;
-            font-weight: 900;
-        }
-
-        .clue-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-md);
-        }
-
-        .clue-header {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .clue-text {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--color-blue);
-            background: var(--bg-secondary);
-            padding: var(--spacing-md);
-            border-radius: var(--radius-sm);
-            text-align: center;
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .clue-count {
-            font-size: 1rem;
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        /* Board */
-        .board-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .turn-indicator {
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: var(--spacing-lg);
-            padding: var(--spacing-md);
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-        }
-
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: var(--spacing-sm);
-            margin: 0 auto;
-            max-width: 800px;
-        }
-
-        .word-card {
-            aspect-ratio: 2/1;
-            background: var(--bg-card);
-            border: 3px solid var(--bg-secondary);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            padding: var(--spacing-sm);
-            text-align: center;
-        }
-
-        .word-card:hover:not(.revealed) {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow);
-            border-color: var(--color-blue);
-        }
-
-        .word-card.revealed {
-            cursor: not-allowed;
-        }
-
-        .word-card.RED {
-            background: linear-gradient(135deg, var(--color-red), var(--color-red-dark));
-            border-color: var(--color-red);
-            color: white;
-        }
-
-        .word-card.BLUE {
-            background: linear-gradient(135deg, var(--color-blue), var(--color-blue-dark));
-            border-color: var(--color-blue);
-            color: white;
-        }
-
-        .word-card.INNOCENT {
-            background: var(--color-beige);
-            border-color: var(--color-beige);
-            color: var(--color-black);
-        }
-
-        .word-card.ASSASSIN {
-            background: var(--color-black);
-            border-color: var(--color-red);
-            color: white;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
-            50% { box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); }
-        }
-
-        /* Spymaster view - show colors on unrevealed cards */
-        .word-card.spy-hint-red:not(.revealed) {
-            border-color: var(--color-red);
-            border-width: 4px;
-        }
-
-        .word-card.spy-hint-blue:not(.revealed) {
-            border-color: var(--color-blue);
-            border-width: 4px;
-        }
-
-        .word-card.spy-hint-beige:not(.revealed) {
-            border-color: var(--color-beige);
-            border-width: 4px;
-        }
-
-        .word-card.spy-hint-black:not(.revealed) {
-            border-color: var(--color-black);
-            border-width: 4px;
-            box-shadow: 0 0 15px rgba(211, 47, 47, 0.5);
-        }
-
-        /* Controls */
-        .controls-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-md);
-        }
-
-        .control-row {
-            display: flex;
-            gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .control-input {
-            flex: 1;
-        }
-
-        /* ============================================ */
-        /* 🎭 MODAL */
-        /* ============================================ */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: var(--spacing-lg);
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .modal-icon {
-            font-size: 4rem;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .modal-message {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-lg);
-            line-height: 1.8;
-        }
-
-        /* ============================================ */
-        /* 📱 RESPONSIVE */
-        /* ============================================ */
-        @media (max-width: 1024px) {
-    .game-layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        height: auto;
-    }
-
-    .sidebar {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: var(--spacing-sm);
-        max-height: none;
-        overflow: visible;
-    }
     
-    /* جعل Controls تأخذ عرض كامل */
-    .controls-card {
-        grid-column: 1 / -1;
-    }
-}
-
-@media (max-width: 768px) {
-    .title {
-        font-size: 2rem;
-    }
-
-    .game-grid {
-        gap: 6px;
-    }
-
-    .word-card {
-        font-size: 0.85rem;
-        padding: 4px;
-    }
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
     
-    /* تصغير العناصر للجوال */
-    .sidebar {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-sm);
-    }
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     
-    .player-info-badge {
-        padding: var(--spacing-sm);
-    }
-    
-    .badge-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
-    }
-    
-    .badge-team {
-        font-size: 0.95rem;
-    }
-    
-    .badge-role {
-        font-size: 0.75rem;
-    }
-    
-    .score-card {
-        padding: var(--spacing-sm);
-    }
-    
-    .score-value {
-        font-size: 1.8rem;
-    }
-    
-    .clue-card {
-        padding: var(--spacing-sm);
-    }
-    
-    .clue-text {
-        font-size: 1.3rem;
-        padding: var(--spacing-sm);
-    }
-    
-    .controls-card {
-        padding: var(--spacing-sm);
-    }
-    
-    .control-row {
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-    
-    .control-input {
-        width: 100%;
-    }
-    
-    #count-input {
-        max-width: 100% !important;
-    }
-}
-
-        @media (max-width: 768px) {
-            .title {
-                font-size: 2rem;
-            }
-
-            .game-grid {
-                gap: 6px;
-            }
-
-            .word-card {
-                font-size: 0.85rem;
-                padding: 4px;
-            }
-        }
-
-        /* ============================================ */
-        /* 🎯 UTILITIES */
-        /* ============================================ */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mb-lg {
-            margin-bottom: var(--spacing-lg);
-        }
-    </style>
+    <!-- JavaScript -->
+    <script src="app.js" defer></script>
 </head>
 <body>
 
 <!-- ============================================ -->
-<!-- HOME SCREEN -->
+<!-- الشاشة الرئيسية -->
 <!-- ============================================ -->
 <div id="home-screen" class="screen active">
     <div class="home-container">
-        <div class="logo">🎯</div>
+        <div class="logo">🎲</div>
         <h1 class="title">Codenames العربية</h1>
-        <p class="subtitle">لعبة أسماء الشفرة الكلاسيكية باللغة العربية</p>
+        <p class="subtitle">لعبة أسماء الشفرة الكلاسيكية بالعربية</p>
         
         <div class="card">
             <div class="input-group">
@@ -648,15 +51,11 @@
                 <li>استمتع باللعبة!</li>
             </ol>
         </div>
-        <!-- زر اختبار الصوت -->
-        <button class="btn btn-ghost" onclick="testSound()">
-            🔊 اختبار الصوت
-        </button>
     </div>
 </div>
 
 <!-- ============================================ -->
-<!-- LOBBY SCREEN -->
+<!-- شاشة اللوبي -->
 <!-- ============================================ -->
 <div id="lobby-screen" class="screen">
     <div class="home-container">
@@ -680,7 +79,7 @@
                 <input type="text" id="join-room-code" placeholder="أدخل الكود" maxlength="6">
             </div>
             <button class="btn btn-secondary" id="btn-join-room">
-                <span>→ انضمام</span>
+                <span>↗ انضمام</span>
             </button>
         </div>
 
@@ -691,7 +90,7 @@
 </div>
 
 <!-- ============================================ -->
-<!-- WAITING ROOM -->
+<!-- غرفة الانتظار -->
 <!-- ============================================ -->
 <div id="waiting-room" class="screen">
     <div class="home-container">
@@ -704,23 +103,23 @@
         <div class="card mb-lg">
             <h3 class="mb-lg">⚔️ اختر فريقك ودورك</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
-                <button class="role-btn" data-team="RED" data-role="SPYMASTER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-red); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
+                <button class="role-btn" data-team="RED" data-role="SPYMASTER">
                     <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">👑</div>
                     <div>قائد أحمر</div>
                 </button>
                 
-                <button class="role-btn" data-team="RED" data-role="GUESSER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-red); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
-                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">🎯</div>
+                <button class="role-btn" data-team="RED" data-role="GUESSER">
+                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">🔍</div>
                     <div>مخمن أحمر</div>
                 </button>
                 
-                <button class="role-btn" data-team="BLUE" data-role="SPYMASTER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-blue); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
+                <button class="role-btn" data-team="BLUE" data-role="SPYMASTER">
                     <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">👑</div>
                     <div>قائد أزرق</div>
                 </button>
                 
-                <button class="role-btn" data-team="BLUE" data-role="GUESSER" style="padding: var(--spacing-lg); background: var(--bg-secondary); border: 3px solid var(--color-blue); border-radius: var(--radius-md); color: white; font-weight: 700; cursor: pointer;">
-                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">🎯</div>
+                <button class="role-btn" data-team="BLUE" data-role="GUESSER">
+                    <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">🔍</div>
                     <div>مخمن أزرق</div>
                 </button>
             </div>
@@ -740,13 +139,13 @@
 </div>
 
 <!-- ============================================ -->
-<!-- GAME SCREEN -->
+<!-- شاشة اللعبة -->
 <!-- ============================================ -->
 <div id="game-screen" class="screen">
     <div class="game-layout">
-        <!-- Sidebar -->
+        <!-- الشريط الجانبي -->
         <div class="sidebar">
-            <!-- Player Info Badge -->
+            <!-- معلومات اللاعب -->
             <div class="player-info-badge" id="player-info-badge">
                 <div class="badge-icon">👤</div>
                 <div class="badge-text">
@@ -755,7 +154,7 @@
                 </div>
             </div>
 
-            <!-- Scores -->
+            <!-- النتائج -->
             <div class="score-card">
                 <div class="score-team">
                     <div>
@@ -769,16 +168,16 @@
                 </div>
             </div>
 
-            <!-- Clue -->
+            <!-- التلميح -->
             <div class="clue-card">
                 <div class="clue-header">💡 التلميح الحالي</div>
                 <div class="clue-text" id="current-clue">في انتظار التلميح...</div>
                 <div class="clue-count" id="clue-guesses">محاولات متبقية: <strong>0</strong></div>
             </div>
 
-            <!-- Controls -->
+            <!-- أدوات التحكم -->
             <div class="controls-card">
-                <!-- Spymaster Controls -->
+                <!-- أدوات القائد -->
                 <div id="spymaster-controls" class="hidden">
                     <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">👑 إعطاء تلميح</h4>
                     <div class="control-row">
@@ -790,33 +189,33 @@
                     </button>
                 </div>
 
-                <!-- Guesser Controls -->
+                <!-- أدوات المخمن -->
                 <div id="guesser-controls" class="hidden">
-                    <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">🎯 دورك في التخمين</h4>
+                    <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">🔍 دورك في التخمين</h4>
                     <button class="btn btn-secondary" id="btn-end-turn">
                         <span>⏭ إنهاء الدور</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Room Info -->
+            <!-- معلومات الغرفة -->
             <div class="card" style="padding: var(--spacing-sm); font-size: 0.85rem; color: var(--text-muted); text-align: center;">
                 <div>كود الغرفة: <strong id="game-room-code" style="color: var(--color-blue);">----</strong></div>
             </div>
         </div>
 
-        <!-- Board -->
+        <!-- اللوحة -->
         <div class="board-container">
             <div class="turn-indicator" id="turn-indicator">دور الفريق الأحمر</div>
             <div class="game-grid" id="game-board">
-                <!-- Cards will be generated here -->
+                <!-- سيتم إنشاء البطاقات هنا -->
             </div>
         </div>
     </div>
 </div>
 
 <!-- ============================================ -->
-<!-- MODAL -->
+<!-- النافذة المنبثقة -->
 <!-- ============================================ -->
 <div id="modal" class="modal-overlay">
     <div class="modal-content">
@@ -828,425 +227,12 @@
 </div>
 
 <!-- ============================================ -->
-<!-- JAVASCRIPT -->
+<!-- مؤشر التحميل -->
 <!-- ============================================ -->
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-// Configuration
-const BACKEND_URL = 'https://codenames-arabic-server.onrender.com';
-let socket;
-let gameState = {
-    username: '',
-    roomCode: '',
-    myTeam: null,
-    myRole: null
-};
-
-// Sound function
-const playSound = (name) => {
-    if (typeof Audio !== 'undefined') {
-        try {
-            // ✅ المسار الصحيح
-            const audio = new Audio(`./assets/sounds/${name}.mp3`);
-            audio.volume = 0.5;
-            audio.play()
-                .then(() => console.log(`✅ Sound played: ${name}`))
-                .catch(e => console.warn(`⚠️ Sound play failed (${name}):`, e));
-        } catch (e) {
-            console.error('Sound error:', e);
-        }
-    }
-};
-
-// Test sound function
-const testSound = () => {
-    try {
-        // ✅ المسار الصحيح
-        const audio = new Audio('./assets/sounds/connected.mp3');
-        audio.volume = 0.5;
-        audio.play()
-            .then(() => {
-                alert('✅ الصوت يعمل بشكل جيد!');
-            })
-            .catch(error => {
-                alert('❌ فشل تشغيل الصوت!\n\nالأسباب المحتملة:\n1. الملفات غير موجودة في المسار الصحيح\n2. المتصفح يحجب الصوت التلقائي\n3. أسماء الملفات غير صحيحة\n\nتفاصيل الخطأ: ' + error.message);
-                console.error('Sound test error:', error);
-            });
-    } catch (e) {
-        alert('❌ خطأ في تشغيل الصوت: ' + e.message);
-        console.error('Sound test exception:', e);
-    }
-};
-
-// ============================================
-// UTILITIES
-// ============================================
-const $ = (id) => document.getElementById(id);
-const switchScreen = (screenId) => {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    $(screenId).classList.add('active');
-};
-
-const Modal = {
-    show(icon, title, message) {
-        $('modal-icon').textContent = icon;
-        $('modal-title').textContent = title;
-        $('modal-message').textContent = message;
-        $('modal').classList.add('active');
-    },
-    hide() {
-        $('modal').classList.remove('active');
-    },
-    success(message) {
-        this.show('✅', 'نجاح!', message);
-    },
-    error(message) {
-        this.show('❌', 'خطأ!', message);
-    },
-    info(message) {
-        this.show('ℹ️', 'معلومة', message);
-    }
-};
-
-// ============================================
-// SOCKET CONNECTION
-// ============================================
-const connectSocket = () => {
-    socket = io(BACKEND_URL, {
-        transports: ['websocket', 'polling']
-    });
-
-    socket.on('connect', () => {
-        console.log('Connected:', socket.id);
-        playSound('connected'); // 🔊
-    });
-
-    socket.on('roomCreated', (data) => {
-        gameState.roomCode = data.code;
-        $('room-code-display').textContent = data.code;
-        switchScreen('waiting-room');
-        updatePlayersList(data.players);
-    });
-
-    socket.on('roomUpdate', (players) => {
-        updatePlayersList(players);
-    });
-
-    socket.on('gameStarted', (data) => {
-        playSound('game_start'); // 🔊
-        gameState.board = data.board;
-        gameState.currentTurn = data.currentTurn;
-        $('game-room-code').textContent = gameState.roomCode;
-        switchScreen('game-screen');
-        renderBoard();
-        updateGameUI(data);
-        Modal.success('بدأت اللعبة! حظاً موفقاً! 🎮');
-    });
-
-    socket.on('clueGiven', (data) => {
-    gameState.clue = data.clue;
-    gameState.guessesLeft = data.count + 1;
-    
-    $('current-clue').textContent = data.clue;
-    $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${data.count + 1}</strong>`;
-});
-
-    socket.on('cardRevealed', (data) => {
-    const card = document.querySelector(`[data-index="${data.cardIndex}"]`);
-    if (card) {
-        card.classList.add('revealed', data.card.type);
-    }
-    
-    // Play sound based on card type 🔊
-    switch (data.card.type) {
-        case 'RED':
-        case 'BLUE':
-            playSound('correct');
-            break;
-        case 'INNOCENT':
-            playSound('wrong');
-            break;
-        case 'ASSASSIN':
-            playSound('assassin_hit');
-            break;
-    }
-    updateScores();
-    
-    // تحديث المحاولات المتبقية
-    if (gameState.guessesLeft > 0) {
-        gameState.guessesLeft--;
-        $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${gameState.guessesLeft}</strong>`;
-    }
-});
-
-    socket.on('gameUpdate', (data) => {
-    if (data.guessesLeft !== undefined) {
-        gameState.guessesLeft = data.guessesLeft;
-        $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${data.guessesLeft}</strong>`;
-    }
-    
-    if (data.clue !== undefined) {
-        gameState.clue = data.clue;
-        $('current-clue').textContent = data.clue || 'في انتظار التلميح...';
-    }
-    
-    updateGameUI(data);
-});
-
-    socket.on('roomError', (msg) => Modal.error(msg));
-    socket.on('gameError', (msg) => Modal.error(msg));
-};
-
-// ============================================
-// HOME SCREEN
-// ============================================
-$('btn-enter-game').addEventListener('click', () => {
-    const username = $('username-input').value.trim();
-    if (!username) {
-        Modal.error('يرجى إدخال اسمك');
-        return;
-    }
-    gameState.username = username;
-    $('player-name-display').textContent = username;
-    switchScreen('lobby-screen');
-    connectSocket();
-});
-
-// ============================================
-// LOBBY SCREEN
-// ============================================
-$('btn-create-room').addEventListener('click', () => {
-    const customName = $('create-room-name').value.toUpperCase().trim();
-    socket.emit('createRoom', {
-        customName,
-        username: gameState.username
-    });
-});
-
-$('btn-join-room').addEventListener('click', () => {
-    const code = $('join-room-code').value.toUpperCase().trim();
-    if (!code) {
-        Modal.error('يرجى إدخال كود الغرفة');
-        return;
-    }
-    socket.emit('joinRoom', {
-        roomCode: code,
-        username: gameState.username
-    });
-    
-    socket.once('roomUpdate', () => {
-        gameState.roomCode = code;
-        $('room-code-display').textContent = code;
-        switchScreen('waiting-room');
-    });
-});
-
-$('btn-back-home').addEventListener('click', () => {
-    if (socket) socket.disconnect();
-    switchScreen('home-screen');
-});
-
-// ============================================
-// WAITING ROOM
-// ============================================
-document.querySelectorAll('.role-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const team = btn.dataset.team;
-        const role = btn.dataset.role;
-        gameState.myTeam = team;
-        gameState.myRole = role;
-        socket.emit('setRole', { team, role });
-    });
-});
-
-$('btn-start-game').addEventListener('click', () => {
-    socket.emit('startGame');
-});
-
-$('btn-leave-room').addEventListener('click', () => {
-    switchScreen('lobby-screen');
-});
-
-const updatePlayersList = (players) => {
-    const list = $('players-list');
-    $('players-count').textContent = players.length;
-    
-    list.innerHTML = players.map(p => {
-        const teamIcon = p.team === 'RED' ? '🔴' : p.team === 'BLUE' ? '🔵' : '⚪';
-        const roleIcon = p.role === 'SPYMASTER' ? ' 👑' : p.role === 'GUESSER' ? ' 🎯' : '';
-        return `<li style="padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--radius-sm);">${teamIcon} ${p.username}${roleIcon}</li>`;
-    }).join('');
-    
-    // Show start button if conditions met
-    const hasEnoughPlayers = players.filter(p => p.team && p.role).length >= 4;
-    if (hasEnoughPlayers) {
-        $('btn-start-game').classList.remove('hidden');
-    } else {
-        $('btn-start-game').classList.add('hidden');
-    }
-};
-
-// ============================================
-// GAME SCREEN
-// ============================================
-const renderBoard = () => {
-    updatePlayerBadge();
-    const board = $('game-board');
-    board.innerHTML = '';
-    
-    gameState.board.forEach((card, index) => {
-        const div = document.createElement('div');
-        div.className = 'word-card';
-        div.textContent = card.word;
-        div.dataset.index = index;
-        
-        if (card.revealed) {
-            div.classList.add('revealed', card.type);
-        } else if (gameState.myRole === 'SPYMASTER') {
-            // Show color hints for spymaster
-            const hintClass = {
-                'RED': 'spy-hint-red',
-                'BLUE': 'spy-hint-blue',
-                'INNOCENT': 'spy-hint-beige',
-                'ASSASSIN': 'spy-hint-black'
-            };
-            div.classList.add(hintClass[card.type]);
-        }
-        
-        if (gameState.myRole === 'GUESSER' && !card.revealed) {
-    div.addEventListener('click', () => {
-        playSound('click'); // 🔊 صوت الضغط
-        socket.emit('makeGuess', { cardIndex: index });
-    });
-}
-        
-        board.appendChild(div);
-    });
-    
-    updateControls();
-};
-
-const updateControls = () => {
-    const spymaster = $('spymaster-controls');
-    const guesser = $('guesser-controls');
-    
-    if (gameState.myRole === 'SPYMASTER') {
-        spymaster.classList.remove('hidden');
-        guesser.classList.add('hidden');
-    } else if (gameState.myRole === 'GUESSER') {
-        spymaster.classList.add('hidden');
-        guesser.classList.remove('hidden');
-    }
-};
-
-const updateGameUI = (data) => {
-    if (data.currentTurn) {
-        const turnText = data.currentTurn === 'RED' ? 'دور الفريق الأحمر 🔴' : 'دور الفريق الأزرق 🔵';
-        $('turn-indicator').textContent = turnText;
-        $('turn-indicator').style.background = data.currentTurn === 'RED' ? 
-            'linear-gradient(135deg, rgba(211, 47, 47, 0.2), transparent)' :
-            'linear-gradient(135deg, rgba(25, 118, 210, 0.2), transparent)';
-    }
-    
-    updateScores();
-    
-    if (data.winner) {
-        playSound('win_game'); // 🔊
-        const winnerText = data.winner === 'RED' ? 'الفريق الأحمر' : 'الفريق الأزرق';
-        setTimeout(() => {
-            Modal.show('🏆', 'انتهت اللعبة!', `فاز ${winnerText}! تهانينا! 🎉`);
-        }, 500);
-    }
-};
-
-const updateScores = () => {
-    if (!gameState.board) return;
-    
-    let red = 0, blue = 0;
-    gameState.board.forEach(card => {
-        if (!card.revealed) {
-            if (card.type === 'RED') red++;
-            if (card.type === 'BLUE') blue++;
-        }
-    });
-    
-    $('red-score').textContent = red;
-    $('blue-score').textContent = blue;
-};
-
-// Spymaster give clue
-$('btn-give-clue').addEventListener('click', () => {
-    const clue = $('clue-input').value.trim();
-    const count = parseInt($('count-input').value);
-    
-    if (!clue || !count || count < 1 || count > 9) {
-        Modal.error('يرجى إدخال تلميح وعدد صحيح');
-        return;
-    }
-    
-    socket.emit('giveClue', { clue, count });
-    $('clue-input').value = '';
-    $('count-input').value = '';
-});
-
-// Guesser end turn
-$('btn-end-turn').addEventListener('click', () => {
-    playSound('door'); // 🔊 صوت الباب
-    socket.emit('endTurn');
-});
-
-// Modal close
-$('modal-confirm').addEventListener('click', () => {
-    Modal.hide();
-});
-
-// Close modal on overlay click
-$('modal').addEventListener('click', (e) => {
-    if (e.target === $('modal')) {
-        Modal.hide();
-    }
-});
-
-// Wake up server on load
-fetch(`${BACKEND_URL}/`).catch(() => {});
-
-// Enter key shortcuts - added directly
-$('username-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') $('btn-enter-game').click();
-});
-
-$('join-room-code').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') $('btn-join-room').click();
-});
-
-$('clue-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') $('btn-give-clue').click();
-});
-// Update player info badge
-const updatePlayerBadge = () => {
-    const badge = $('player-info-badge');
-    if (!badge) return;
-    
-    const teamText = gameState.myTeam === 'RED' ? '🔴 الفريق الأحمر' : 
-                     gameState.myTeam === 'BLUE' ? '🔵 الفريق الأزرق' : 'لا فريق';
-    
-    const roleText = gameState.myRole === 'SPYMASTER' ? '👑 القائد' : 
-                     gameState.myRole === 'GUESSER' ? '🎯 المخمن' : '';
-    
-    badge.querySelector('.badge-team').textContent = teamText;
-    badge.querySelector('.badge-role').textContent = roleText;
-    
-    // Add team class
-    badge.classList.remove('team-red', 'team-blue');
-    if (gameState.myTeam === 'RED') {
-        badge.classList.add('team-red');
-        badge.querySelector('.badge-icon').textContent = '🔴';
-    } else if (gameState.myTeam === 'BLUE') {
-        badge.classList.add('team-blue');
-        badge.querySelector('.badge-icon').textContent = '🔵';
-    }
-};
-</script>
+<div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">جاري التحميل...</p>
+</div>
 
 </body>
 </html>
