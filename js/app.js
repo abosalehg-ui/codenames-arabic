@@ -1,3 +1,6 @@
+// ============================================
+// ⚙️ الإعدادات العامة
+// ============================================
 const BACKEND_URL = 'https://codenames-arabic-server.onrender.com';
 
 let socket;
@@ -10,26 +13,29 @@ let gameState = {
     board: [],
     currentTurn: null,
     clue: null,
-    guessesLeft: 0
+    guessesLeft: 0,
+    players: []
 };
 
 // ============================================
-// 🔊 SOUND EFFECTS
+// 🔊 تشغيل الأصوات
 // ============================================
 const playSound = (name) => {
     if (typeof Audio !== 'undefined') {
         try {
             const audio = new Audio(`./assets/sounds/${name}.mp3`);
             audio.volume = 0.5;
-            audio.play().catch(e => console.warn('Sound play failed:', e));
+            audio.play()
+                .then(() => console.log(`✅ تم تشغيل الصوت: ${name}`))
+                .catch(e => console.warn(`⚠️ فشل تشغيل الصوت (${name}):`, e));
         } catch (e) {
-            console.warn('Sound error:', e);
+            console.error('خطأ في الصوت:', e);
         }
     }
 };
 
 // ============================================
-// 🛠️ UTILITIES
+// 🛠️ الأدوات المساعدة
 // ============================================
 const $ = (id) => document.getElementById(id);
 
@@ -38,71 +44,112 @@ const switchScreen = (screenId) => {
     $(screenId).classList.add('active');
 };
 
+// ============================================
+// ⏳ مؤشر التحميل
+// ============================================
+const Loading = {
+    show() {
+        $('loading-overlay').classList.remove('hidden');
+    },
+    hide() {
+        $('loading-overlay').classList.add('hidden');
+    }
+};
+
+// ============================================
+// 🎭 النوافذ المنبثقة
+// ============================================
 const Modal = {
+    currentCallback: null,
+    
     show(icon, title, message, onConfirm = null) {
         $('modal-icon').textContent = icon;
         $('modal-title').textContent = title;
         $('modal-message').textContent = message;
         $('modal').classList.add('active');
         
-        if (onConfirm) {
-            $('modal-confirm').onclick = () => {
-                this.hide();
-                onConfirm();
-            };
-        }
+        this.currentCallback = onConfirm;
     },
+    
     hide() {
         $('modal').classList.remove('active');
+        this.currentCallback = null;
     },
+    
+    confirm() {
+        if (this.currentCallback) {
+            this.currentCallback();
+        }
+        this.hide();
+    },
+    
     success(message, onConfirm) {
         this.show('✅', 'نجاح!', message, onConfirm);
     },
+    
     error(message) {
         this.show('❌', 'خطأ!', message);
     },
+    
     info(message) {
         this.show('ℹ️', 'معلومة', message);
+    },
+    
+    askConfirmation(message, onConfirm) {
+        this.show('⚠️', 'تأكيد', message, onConfirm);
     }
 };
 
 // ============================================
-// 🌐 SOCKET CONNECTION
+// 🌐 اتصال Socket.IO
 // ============================================
 const connectSocket = () => {
+    Loading.show();
+    
     socket = io(BACKEND_URL, {
         transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: 5
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
     });
 
+    // الاتصال
     socket.on('connect', () => {
-        console.log('✅ Connected:', socket.id);
+        console.log('✅ تم الاتصال:', socket.id);
+        Loading.hide();
         playSound('connected');
     });
 
     socket.on('disconnect', () => {
-        console.log('❌ Disconnected');
+        console.log('⛔ انقطع الاتصال');
+        Loading.hide();
     });
 
     socket.on('connect_error', (error) => {
-        console.error('Connection error:', error);
+        console.error('❌ خطأ في الاتصال:', error);
+        Loading.hide();
         Modal.error('فشل الاتصال بالخادم. يرجى المحاولة لاحقاً.');
     });
 
-    // Room events
+    // أحداث الغرفة
     socket.on('roomCreated', handleRoomCreated);
     socket.on('roomUpdate', handleRoomUpdate);
-    socket.on('roomError', (msg) => Modal.error(msg));
+    socket.on('roomError', (msg) => {
+        Loading.hide();
+        Modal.error(msg);
+    });
 
-    // Game events
+    // أحداث اللعبة
     socket.on('gameStarted', handleGameStarted);
     socket.on('gameUpdate', handleGameUpdate);
     socket.on('clueGiven', handleClueGiven);
     socket.on('cardRevealed', handleCardRevealed);
-    socket.on('gameError', (msg) => Modal.error(msg));
+    socket.on('gameError', (msg) => {
+        Loading.hide();
+        Modal.error(msg);
+    });
 
-    // Player events
+    // أحداث اللاعبين
     socket.on('playerDisconnected', (data) => {
         Modal.info(`انقطع اتصال ${data.username}`);
     });
@@ -113,11 +160,15 @@ const connectSocket = () => {
 };
 
 // ============================================
-// 📥 SOCKET EVENT HANDLERS
+// 📥 معالجات أحداث Socket
 // ============================================
+
+// إنشاء غرفة
 const handleRoomCreated = (data) => {
-    console.log('Room created:', data);
+    console.log('🎉 تم إنشاء الغرفة:', data);
+    Loading.hide();
     playSound('connected');
+    
     gameState.roomCode = data.code;
     gameState.players = data.players;
     
@@ -128,22 +179,28 @@ const handleRoomCreated = (data) => {
     Modal.success(`تم إنشاء الغرفة بنجاح! الكود: ${data.code}`);
 };
 
+// تحديث الغرفة
 const handleRoomUpdate = (players) => {
-    console.log('Room update:', players);
+    console.log('🔄 تحديث الغرفة:', players);
     gameState.players = players;
     updatePlayersList(players);
 };
 
+// بدء اللعبة
 const handleGameStarted = (data) => {
-    console.log('Game started:', data);
+    console.log('🎮 بدأت اللعبة:', data);
+    Loading.hide();
     playSound('game_start');
     
     gameState.board = data.board;
     gameState.currentTurn = data.currentTurn;
     gameState.firstTeam = data.firstTeam;
     
-    // Find my player
-    const myPlayer = data.players.find(p => p.socketId === socket.id || p.id === socket.id);
+    // العثور على بيانات اللاعب الحالي
+    const myPlayer = data.players.find(p => 
+        p.socketId === socket.id || p.id === socket.id
+    );
+    
     if (myPlayer) {
         gameState.myTeam = myPlayer.team;
         gameState.myRole = myPlayer.role;
@@ -152,13 +209,15 @@ const handleGameStarted = (data) => {
     $('game-room-code').textContent = gameState.roomCode;
     switchScreen('game-screen');
     renderBoard();
+    updatePlayerBadge();
     updateGameUI(data);
     
     Modal.success('بدأت اللعبة! حظاً موفقاً! 🎮');
 };
 
+// تحديث اللعبة
 const handleGameUpdate = (data) => {
-    console.log('Game update:', data);
+    console.log('🔄 تحديث اللعبة:', data);
     
     if (data.currentTurn) gameState.currentTurn = data.currentTurn;
     if (data.clue) gameState.clue = data.clue;
@@ -167,6 +226,7 @@ const handleGameUpdate = (data) => {
     
     updateGameUI(data);
     
+    // التحقق من الفائز
     if (data.winner) {
         playSound('win_game');
         const winnerText = data.winner === 'RED' ? 'الفريق الأحمر' : 'الفريق الأزرق';
@@ -182,8 +242,9 @@ const handleGameUpdate = (data) => {
     }
 };
 
+// إعطاء تلميح
 const handleClueGiven = (data) => {
-    console.log('Clue given:', data);
+    console.log('💡 تم إعطاء تلميح:', data);
     playSound('clue_given');
     
     gameState.clue = data.clue;
@@ -196,23 +257,24 @@ const handleClueGiven = (data) => {
     Modal.info(`تلميح جديد من الفريق ${teamText}: "${data.clue}" - ${data.count} كلمات`);
 };
 
+// كشف بطاقة
 const handleCardRevealed = (data) => {
-    console.log('Card revealed:', data);
+    console.log('🎴 تم كشف بطاقة:', data);
     
-    const { cardIndex, card, result } = data;
+    const { cardIndex, card } = data;
     
-    // Update local board state
+    // تحديث حالة اللوحة المحلية
     if (gameState.board[cardIndex]) {
         gameState.board[cardIndex] = card;
     }
     
-    // Update UI
+    // تحديث واجهة المستخدم
     const cardElement = document.querySelector(`[data-index="${cardIndex}"]`);
     if (cardElement) {
         cardElement.classList.add('revealed', card.type);
     }
     
-    // Play appropriate sound
+    // تشغيل الصوت المناسب
     switch (card.type) {
         case 'RED':
         case 'BLUE':
@@ -227,10 +289,16 @@ const handleCardRevealed = (data) => {
     }
     
     updateScores();
+    
+    // تحديث المحاولات المتبقية
+    if (gameState.guessesLeft > 0) {
+        gameState.guessesLeft--;
+        $('clue-guesses').innerHTML = `محاولات متبقية: <strong>${gameState.guessesLeft}</strong>`;
+    }
 };
 
 // ============================================
-// 🏠 HOME SCREEN
+// 🏠 الشاشة الرئيسية
 // ============================================
 $('btn-enter-game').addEventListener('click', () => {
     const username = $('username-input').value.trim();
@@ -253,8 +321,10 @@ $('btn-enter-game').addEventListener('click', () => {
 });
 
 // ============================================
-// 🏢 LOBBY SCREEN
+// 🏢 شاشة اللوبي
 // ============================================
+
+// إنشاء غرفة
 $('btn-create-room').addEventListener('click', () => {
     const customName = $('create-room-name').value.toUpperCase().trim();
     
@@ -263,6 +333,7 @@ $('btn-create-room').addEventListener('click', () => {
         return;
     }
     
+    Loading.show();
     socket.emit('createRoom', {
         customName,
         username: gameState.username,
@@ -270,6 +341,7 @@ $('btn-create-room').addEventListener('click', () => {
     });
 });
 
+// الانضمام لغرفة
 $('btn-join-room').addEventListener('click', () => {
     const code = $('join-room-code').value.toUpperCase().trim();
     
@@ -283,6 +355,7 @@ $('btn-join-room').addEventListener('click', () => {
         return;
     }
     
+    Loading.show();
     socket.emit('joinRoom', {
         roomCode: code,
         username: gameState.username,
@@ -290,6 +363,7 @@ $('btn-join-room').addEventListener('click', () => {
     });
     
     socket.once('roomUpdate', (players) => {
+        Loading.hide();
         gameState.roomCode = code;
         $('room-code-display').textContent = code;
         switchScreen('waiting-room');
@@ -297,6 +371,7 @@ $('btn-join-room').addEventListener('click', () => {
     });
 });
 
+// العودة للشاشة الرئيسية
 $('btn-back-home').addEventListener('click', () => {
     if (socket) {
         socket.disconnect();
@@ -305,8 +380,10 @@ $('btn-back-home').addEventListener('click', () => {
 });
 
 // ============================================
-// ⏳ WAITING ROOM
+// ⏳ غرفة الانتظار
 // ============================================
+
+// اختيار الدور
 document.querySelectorAll('.role-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         const team = this.dataset.team;
@@ -317,7 +394,7 @@ document.querySelectorAll('.role-btn').forEach(btn => {
         
         socket.emit('setRole', { team, role });
         
-        // Visual feedback
+        // تأثير بصري
         document.querySelectorAll('.role-btn').forEach(b => {
             b.style.opacity = '0.5';
         });
@@ -326,26 +403,32 @@ document.querySelectorAll('.role-btn').forEach(btn => {
         setTimeout(() => {
             this.style.transform = 'scale(1)';
         }, 200);
+        
+        playSound('click');
     });
 });
 
+// بدء اللعبة
 $('btn-start-game').addEventListener('click', () => {
+    Loading.show();
     socket.emit('startGame');
 });
 
+// مغادرة الغرفة
 $('btn-leave-room').addEventListener('click', () => {
-    Modal.show('⚠️', 'تأكيد', 'هل تريد مغادرة الغرفة؟', () => {
+    Modal.askConfirmation('هل تريد مغادرة الغرفة؟', () => {
         switchScreen('lobby-screen');
     });
 });
 
+// تحديث قائمة اللاعبين
 const updatePlayersList = (players) => {
     const list = $('players-list');
     $('players-count').textContent = players.length;
     
     list.innerHTML = players.map(p => {
         const teamIcon = p.team === 'RED' ? '🔴' : p.team === 'BLUE' ? '🔵' : '⚪';
-        const roleIcon = p.role === 'SPYMASTER' ? ' 👑' : p.role === 'GUESSER' ? ' 🎯' : '';
+        const roleIcon = p.role === 'SPYMASTER' ? ' 👑' : p.role === 'GUESSER' ? ' 🔍' : '';
         const isMe = p.id === socket.id || p.socketId === socket.id;
         
         return `
@@ -356,7 +439,7 @@ const updatePlayersList = (players) => {
         `;
     }).join('');
     
-    // Show start button if host and enough players
+    // إظهار زر البدء إذا كان المضيف ويوجد لاعبون كافيون
     const hasRedSpymaster = players.some(p => p.team === 'RED' && p.role === 'SPYMASTER');
     const hasBlueSpymaster = players.some(p => p.team === 'BLUE' && p.role === 'SPYMASTER');
     const hasEnoughPlayers = players.length >= 4;
@@ -370,14 +453,16 @@ const updatePlayersList = (players) => {
 };
 
 // ============================================
-// 🎮 GAME SCREEN
+// 🎮 شاشة اللعبة
 // ============================================
+
+// عرض اللوحة
 const renderBoard = () => {
     const board = $('game-board');
     board.innerHTML = '';
     
     if (!gameState.board || gameState.board.length === 0) {
-        console.error('No board data available');
+        console.error('❌ لا توجد بيانات للوحة');
         return;
     }
     
@@ -390,7 +475,7 @@ const renderBoard = () => {
         if (card.revealed) {
             div.classList.add('revealed', card.type);
         } else if (gameState.myRole === 'SPYMASTER') {
-            // Show color hints for spymaster
+            // إظهار تلميحات الألوان للقائد
             const hintClass = {
                 'RED': 'spy-hint-red',
                 'BLUE': 'spy-hint-blue',
@@ -400,7 +485,7 @@ const renderBoard = () => {
             div.classList.add(hintClass[card.type]);
         }
         
-        // Add click handler for guessers
+        // إضافة معالج النقر للمخمنين
         if (gameState.myRole === 'GUESSER' && !card.revealed && 
             gameState.currentTurn === gameState.myTeam) {
             div.addEventListener('click', () => handleCardClick(index));
@@ -413,33 +498,39 @@ const renderBoard = () => {
     updateScores();
 };
 
+// معالجة نقرة البطاقة
 const handleCardClick = (index) => {
     if (gameState.guessesLeft === 0) {
         Modal.error('لا توجد محاولات متبقية');
         return;
     }
     
+    playSound('click');
     socket.emit('makeGuess', { cardIndex: index });
 };
 
+// تحديث أدوات التحكم
 const updateControls = () => {
     const spymaster = $('spymaster-controls');
     const guesser = $('guesser-controls');
     
+    const isMyTurn = gameState.currentTurn === gameState.myTeam;
+    
     if (gameState.myRole === 'SPYMASTER') {
-        spymaster.classList.remove('hidden');
+        spymaster.classList.toggle('hidden', !isMyTurn);
         guesser.classList.add('hidden');
     } else if (gameState.myRole === 'GUESSER') {
         spymaster.classList.add('hidden');
-        guesser.classList.remove('hidden');
+        guesser.classList.toggle('hidden', !isMyTurn);
     } else {
         spymaster.classList.add('hidden');
         guesser.classList.add('hidden');
     }
 };
 
+// تحديث واجهة اللعبة
 const updateGameUI = (data) => {
-    // Update turn indicator
+    // تحديث مؤشر الدور
     if (data.currentTurn) {
         const isMyTurn = data.currentTurn === gameState.myTeam;
         const turnText = data.currentTurn === 'RED' ? 
@@ -451,7 +542,7 @@ const updateGameUI = (data) => {
             'linear-gradient(135deg, rgba(25, 118, 210, 0.2), transparent)';
     }
     
-    // Update clue display
+    // تحديث عرض التلميح
     if (data.clue) {
         $('current-clue').textContent = data.clue;
     }
@@ -461,8 +552,10 @@ const updateGameUI = (data) => {
     }
     
     updateScores();
+    updateControls();
 };
 
+// تحديث النتائج
 const updateScores = () => {
     if (!gameState.board || gameState.board.length === 0) return;
     
@@ -479,7 +572,34 @@ const updateScores = () => {
     $('blue-score').textContent = blue;
 };
 
-// Spymaster controls
+// تحديث شارة اللاعب
+const updatePlayerBadge = () => {
+    const badge = $('player-info-badge');
+    if (!badge) return;
+    
+    const teamText = gameState.myTeam === 'RED' ? '🔴 الفريق الأحمر' : 
+                     gameState.myTeam === 'BLUE' ? '🔵 الفريق الأزرق' : 'لا فريق';
+    
+    const roleText = gameState.myRole === 'SPYMASTER' ? '👑 القائد' : 
+                     gameState.myRole === 'GUESSER' ? '🔍 المخمن' : '';
+    
+    badge.querySelector('.badge-team').textContent = teamText;
+    badge.querySelector('.badge-role').textContent = roleText;
+    
+    // إضافة فئة الفريق
+    badge.classList.remove('team-red', 'team-blue');
+    if (gameState.myTeam === 'RED') {
+        badge.classList.add('team-red');
+        badge.querySelector('.badge-icon').textContent = '🔴';
+    } else if (gameState.myTeam === 'BLUE') {
+        badge.classList.add('team-blue');
+        badge.querySelector('.badge-icon').textContent = '🔵';
+    }
+};
+
+// ============================================
+// 👑 أدوات القائد
+// ============================================
 $('btn-give-clue').addEventListener('click', () => {
     const clue = $('clue-input').value.trim();
     const count = parseInt($('count-input').value);
@@ -499,25 +619,37 @@ $('btn-give-clue').addEventListener('click', () => {
         return;
     }
     
-    socket.emit('giveClue', { clue, count });
-    
-    // Clear inputs
-    $('clue-input').value = '';
-    $('count-input').value = '';
+    // تأكيد إعطاء التلميح
+    Modal.askConfirmation(
+        `هل تريد إعطاء التلميح: "${clue}" - ${count} كلمات؟`,
+        () => {
+            Loading.show();
+            socket.emit('giveClue', { clue, count });
+            
+            // مسح الحقول
+            $('clue-input').value = '';
+            $('count-input').value = '';
+            
+            setTimeout(() => Loading.hide(), 1000);
+        }
+    );
 });
 
-// Guesser controls
+// ============================================
+// 🔍 أدوات المخمن
+// ============================================
 $('btn-end-turn').addEventListener('click', () => {
-    Modal.show('⚠️', 'تأكيد', 'هل تريد إنهاء دورك؟', () => {
+    Modal.askConfirmation('هل تريد إنهاء دورك؟', () => {
+        playSound('door');
         socket.emit('endTurn');
     });
 });
 
 // ============================================
-// 🎭 MODAL
+// 🎭 أحداث النافذة المنبثقة
 // ============================================
 $('modal-confirm').addEventListener('click', () => {
-    Modal.hide();
+    Modal.confirm();
 });
 
 $('modal').addEventListener('click', (e) => {
@@ -526,30 +658,41 @@ $('modal').addEventListener('click', (e) => {
     }
 });
 
+// إغلاق بزر ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && $('modal').classList.contains('active')) {
+        Modal.hide();
+    }
+});
+
 // ============================================
-// 🚀 INITIALIZATION
+// ⌨️ اختصارات لوحة المفاتيح
+// ============================================
+$('username-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') $('btn-enter-game').click();
+});
+
+$('join-room-code').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') $('btn-join-room').click();
+});
+
+$('clue-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') $('btn-give-clue').click();
+});
+
+// ============================================
+// 🚀 التهيئة عند تحميل الصفحة
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('App initialized');
+    console.log('🎮 تم تحميل التطبيق');
     
-    // Wake up server
+    // إيقاظ الخادم
     fetch(`${BACKEND_URL}/`)
-        .then(() => console.log('Server pinged successfully'))
-        .catch(err => console.warn('Server ping failed:', err));
+        .then(() => console.log('✅ تم الاتصال بالخادم'))
+        .catch(err => console.warn('⚠️ فشل الاتصال بالخادم:', err));
     
-    // Focus username input
+    // التركيز على حقل الاسم
     $('username-input').focus();
     
-    // Enter key on inputs
-    $('username-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') $('btn-enter-game').click();
-    });
-    
-    $('join-room-code').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') $('btn-join-room').click();
-    });
-    
-    $('clue-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') $('btn-give-clue').click();
-    });
+    console.log('🎉 جاهز للعب!');
 });
