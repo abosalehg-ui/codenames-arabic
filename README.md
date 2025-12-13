@@ -183,6 +183,408 @@
 - ✅ Safari
 - ✅ Opera
 
+### Minimum Specifications
+- Modern browser supporting ES6+
+- JavaScript enabled
+- Stable internet connection
+- WebSocket support
+
+### Supported Devices
+- 💻 **Computer**: Windows, Mac, Linux
+- 📱 **Mobile**: iOS, Android
+- 📲 **Tablet**: iPad, Android Tablets
+
+---
+
+## 🏗️ Technical Architecture
+
+### Frontend (Client)
+```
+├── index.html            (Main structure)
+├── css/
+│   └── style.css         (Styles)
+├── js/
+│   └── app.js            (Game logic)
+└── assets/
+    └── sounds/           (Sound effects)
+        ├── connected.mp3
+        ├── game_start.mp3
+        ├── correct.mp3
+        ├── wrong.mp3
+        ├── assassin_hit.mp3
+        ├── win_game.mp3
+        ├── clue_given.mp3
+        ├── click.mp3
+        └── door.mp3
+```
+
+### Backend (Server)
+```
+Server: Node.js + Express + Socket.IO
+URL: https://codenames-arabic-server.onrender.com
+```
+
+### Technologies Used
+- **HTML5**: Basic structure
+- **CSS3**: Design and animations
+- **JavaScript (ES6+)**: Client logic
+- **Socket.IO Client**: Real-time connection
+- **Node.js**: Game server
+- **Express**: Framework
+- **Socket.IO Server**: WebSocket
+
+---
+
+## 📦 Installation & Running
+
+### Local Running (for development)
+
+#### 1️⃣ Clone Project
+```bash
+git clone https://github.com/abosalehg-ui/codenames-arabic.git
+cd codenames-arabic
+```
+
+#### 2️⃣ Run Frontend
+```bash
+# Open index.html in browser
+# Or use local server:
+python -m http.server 8000
+# Then open: http://localhost:8000
+```
+
+#### 3️⃣ Run Backend (optional for development)
+```bash
+# If you want to run local server
+cd server
+npm install
+node server.js
+# Then modify BACKEND_URL in app.js
+```
+
+### Deploy on GitHub Pages
+
+```bash
+# 1. Upload code to GitHub
+git add .
+git commit -m "Update game"
+git push origin main
+
+# 2. In repository settings:
+Settings → Pages → Source: main branch
+
+# 3. Will be available at:
+https://username.github.io/codenames-arabic/
+```
+
+---
+
+## 🎯 How to Play Effectively
+
+### Tips for Spymaster 👑
+
+#### 1. Good Clues:
+```
+✅ Good: "fruits 3" → (apple, banana, orange)
+✅ Good: "sea 2" → (fish, water)
+❌ Bad: "thing 5" (too general)
+❌ Bad: Using words from cards themselves
+```
+
+#### 2. Strategies:
+- Start with safe clues (two or three words)
+- Avoid words close to assassin
+- Calculate risks vs benefits
+- Watch opponent's cards
+
+#### 3. Common Mistakes:
+- ❌ Giving too vague clues
+- ❌ Rushing without thinking
+- ❌ Forgetting assassin location
+
+### Tips for Guesser 🔍
+
+#### 1. Team Communication:
+```
+✅ Discuss possibilities together
+✅ Listen to everyone's opinions
+✅ Vote on final choice
+❌ Don't rush clicking
+```
+
+#### 2. Logical Thinking:
+- Connect clue to available words
+- Exclude words far in meaning
+- Remember previous clues
+
+#### 3. Risk Management:
+- Last (bonus) attempt is risky
+- If unsure, end turn
+- Avoid random guessing
+
+---
+
+## 📊 Game Statistics
+
+### Card Information:
+- **Total Cards**: 25
+- **First Team**: 9 cards
+- **Second Team**: 8 cards
+- **Neutrals**: 7 cards
+- **Assassin**: 1 card
+
+### Average Game Time:
+- Quick game: 10-15 minutes
+- Medium game: 15-25 minutes
+- Long game: 25-40 minutes
+
+---
+
+## 🐛 Common Issues & Solutions
+
+### 1. Sound Not Working
+```
+Solution:
+1. Enable sound in browser
+2. Check sound files exist in assets/sounds/
+3. Some browsers block autoplay - click anywhere first
+```
+
+### 2. Connection Lost
+```
+Solution:
+1. Check internet connection
+2. Refresh page (F5)
+3. Game supports automatic reconnection
+```
+
+### 3. Cards Not Showing
+```
+Solution:
+1. Ensure CSS loads correctly
+2. Open Console (F12) and check errors
+3. Clear cache and refresh (Ctrl+F5)
+```
+
+### 4. Room Not Opening
+```
+Solution:
+1. Ensure server is running
+2. Check entered code is correct (6 characters)
+3. Try creating new room
+```
+
+---
+
+## 🔄 Roadmap
+
+### ✅ Version 1.0.0 (Current)
+- [x] Basic multiplayer gameplay
+- [x] Private rooms with codes
+- [x] Sound effects
+- [x] Responsive design
+- [x] Automatic reconnection
+
+### 🔜 Version 1.1.0 (Soon)
+- [ ] Statistics and ranking system
+- [ ] Previous games history
+- [ ] Text chat in room
+- [ ] More word sets
+- [ ] Choose word set (sports, history, etc.)
+
+### 🚀 Version 2.0.0 (Future)
+- [ ] Single player vs AI
+- [ ] Public rooms for random players
+- [ ] Friends system
+- [ ] Invite notifications
+- [ ] Tournament mode
+- [ ] Native mobile app
+- [ ] Additional language support
+
+---
+
+## 🤝 Contributing
+
+We welcome your contributions! Here's how:
+
+### 1️⃣ Report Bugs
+```markdown
+When reporting bug, please include:
+- Accurate problem description
+- Steps to reproduce bug
+- Screenshot (if possible)
+- Browser type and device
+```
+
+### 2️⃣ Suggest Features
+```markdown
+We welcome your ideas! Explain:
+- Proposed feature in detail
+- How it improves the game
+- Any examples or references
+```
+
+### 3️⃣ Contribute Code
+```bash
+# 1. Fork the project
+# 2. Create new branch
+git checkout -b feature/amazing-feature
+
+# 3. Make changes
+git commit -m "Add: amazing feature"
+
+# 4. Push to branch
+git push origin feature/amazing-feature
+
+# 5. Open Pull Request
+```
+
+### 4️⃣ Add New Words
+```
+Looking for contributors to add:
+- New word sets
+- Words from different fields
+- Better translations and localizations
+```
+
+---
+
+## 👨‍💻 Team
+
+### Lead Developer
+**Abdulkareem Al-Aboud**
+- 📧 Email: [abo.saleh.g@gmail.com](mailto:abo.saleh.g@gmail.com)
+- 🌐 GitHub: [@abosalehg-ui](https://github.com/abosalehg-ui)
+
+### Contributors
+Thanks to everyone who contributed to game development! (Coming soon)
+
+---
+
+## 📄 License
+
+```
+MIT License
+
+Copyright (c) 2024 Abdulkareem Al-Aboud
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
+## 📞 Contact & Support
+
+### 🌐 Important Links
+- 🎮 **Game**: [https://abosalehg-ui.github.io/codenames-arabic/](https://abosalehg-ui.github.io/codenames-arabic/)
+- 💻 **Source Code**: [https://github.com/abosalehg-ui/codenames-arabic](https://github.com/abosalehg-ui/codenames-arabic)
+- 📖 **Documentation**: [Wiki](https://github.com/abosalehg-ui/codenames-arabic/wiki)
+- 🐛 **Report Bugs**: [Issues](https://github.com/abosalehg-ui/codenames-arabic/issues)
+
+### 📧 Contact Methods
+- **Email**: abo.saleh.g@gmail.com
+- **GitHub Issues**: For bugs and suggestions
+- **Discussions**: For questions and discussions
+
+---
+
+## ❓ Frequently Asked Questions (FAQ)
+
+### About the Game
+
+<details>
+<summary><strong>Is the game free?</strong></summary>
+
+Yes, the game is completely free and open source.
+</details>
+
+<details>
+<summary><strong>Does the game require account creation?</strong></summary>
+
+No, just enter your name and start playing immediately.
+</details>
+
+<details>
+<summary><strong>How many players are required?</strong></summary>
+
+Minimum 4 players (spymaster and guesser for each team), maximum 8 players.
+</details>
+
+<details>
+<summary><strong>Can I play on mobile?</strong></summary>
+
+Yes! The game is responsive and works great on mobile devices.
+</details>
+
+### Technical
+
+<details>
+<summary><strong>Is data saved?</strong></summary>
+
+Game state is saved on server during session. When room closes, data is deleted.
+</details>
+
+<details>
+<summary><strong>What if my connection drops?</strong></summary>
+
+Game supports automatic reconnection. Just refresh the page.
+</details>
+
+<details>
+<summary><strong>Where is the server hosted?</strong></summary>
+
+Server is hosted on Render.com and runs 24/7.
+</details>
+
+---
+
+## 🎉 Special Thanks
+
+- **Vlaada Chvátil**: Creator of original Codenames game
+- **Czech Games Edition**: Original publisher
+- **Arab Developer Community**: For support and encouragement
+- **All Contributors**: Who help improve the game
+
+---
+
+<div align="center">
+
+### 🌟 If you like the game, add a star ⭐ on GitHub!
+
+**Codenames Arabic** - Where Words Meet Intelligence
+
+Made with ❤️ by Abdulkareem Al-Aboud
+
+---
+
+[![GitHub](https://img.shields.io/badge/GitHub-abosalehg--ui-black?style=for-the-badge&logo=github)](https://github.com/abosalehg-ui)
+[![Email](https://img.shields.io/badge/Email-abo.saleh.g%40gmail.com-red?style=for-the-badge&logo=gmail)](mailto:abo.saleh.g@gmail.com)
+[![Website](https://img.shields.io/badge/Play-Now-orange?style=for-the-badge&logo=googleplay)](https://abosalehg-ui.github.io/codenames-arabic/)
+
+---
+
+**Happy Playing! استمتع باللعب!** 🎮🎉
+
+</div>
+- ✅ Safari
+- ✅ Opera
+
 ### الحد الأدنى من المواصفات
 - متصفح حديث يدعم ES6+
 - JavaScript مفعّل
